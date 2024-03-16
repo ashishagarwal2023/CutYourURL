@@ -77,7 +77,7 @@ def short():
             if not url.startswith("https://"):
                 url = "https://" + url
 
-            app.logger.info(f'POST request received for URL: {url} at {datetime.now()}')
+            app.logger.info(f'POST request received for URL: {url}')
 
             db = get_db()
             cursor = db.cursor()
@@ -86,7 +86,7 @@ def short():
 
             if existing_short_url:
                 cursor.close()
-                app.logger.debug(f'Returning existing short URL: {existing_short_url[0]}')
+                app.logger.debug(f'Returning existing short URL: /{existing_short_url[0]}')
                 return f"{request.url_root}{existing_short_url[0]}"
 
             short_url = gen_short()
@@ -100,7 +100,7 @@ def short():
             cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url))
             db.commit()
             cursor.close()
-            app.logger.info(f'Generated new short URL: {short_url}')
+            app.logger.info(f'Generated new short URL: /{short_url}')
             return f"{request.url_root}{short_url}"
         except:
             return "Not a valid POST response", 400    
