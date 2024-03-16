@@ -9,13 +9,8 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-<!--<h1>URL Shorter</h1>-->
-<!--<form method="POST" action="{{ url_for('index') }}">-->
-<!--    <input type="text" name="url" placeholder="Enter URL to short">-->
-<!--    <button type="submit">Short</button>-->
-<!--</form>-->
 <main>
-    <section id="short">
+    <section id="short" class="main">
         <h1>CutYourURL.me - Free URL Shortener Service</h1>
         <form action="{{ url_for('short') }}" method="post">
             <div id="shortForm">

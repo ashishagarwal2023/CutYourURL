@@ -207,5 +207,10 @@ input[name="submit"] {
 @media all and (max-width: 1000px) {
   html {
     padding-bottom: 180px;
+    padding-top: 10px;
   }
+}
+
+section#short.main{
+  margin-top: 30px;
 }

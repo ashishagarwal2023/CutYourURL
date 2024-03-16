@@ -105,7 +105,7 @@ def short():
         except:
             return "Not a valid POST response", 400    
     else:
-        return "Not a valid POST response", 400
+        return render_template("generated.html")
 
 
 @app.route("/<short_url>")
