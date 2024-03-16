@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://cutyoururl.me/" rel="noopener">
+  <a href="https://ashish2023.pythonanywhere.com/" rel="noopener">
  <img width=200px height=200px src="static/CutYourURL.png" alt="CutYourURL Logo"></a>
 </p>
 

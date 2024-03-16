@@ -1,3 +1,8 @@
+black_shorts = ["new", "home", "website", "site", "about", "details", "contact"]
+dir = "s"
+DATABASE = './cache/shorts.db'
+log_file_path = "./cache/logs/shorts.log"
+
 # Coded by ashishagarwal2023
 # Date initially published to GitHub: 17 March 2024 1AM
 # DO NOT COPY!
@@ -11,8 +16,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 
-dir = "s"
-log_file_path = "./cache/logs/shorts.log"
+LOGS = log_file_path
 log_dir = os.path.dirname(log_file_path)
 
 os.makedirs(log_dir, exist_ok=True)
@@ -23,8 +27,6 @@ if not os.path.exists(log_file_path):
  
 
 app = Flask(__name__)
-DATABASE = './cache/shorts.db'
-LOGS = './cache/logs/shorts.log'
 print(f"Database at {DATABASE}, logging at {LOGS}")
 log_formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s', datefmt='%d %b %Y at %H:%M:%S')
 log_handler = TimedRotatingFileHandler(LOGS, when='midnight', interval=1, backupCount=30)
@@ -74,8 +76,9 @@ def index():
 def short():
     if request.method == "POST":
         try:
-            url = request.form.get("url")
-            if not url.startswith("https://"):
+            url = request.form.get("url").lower()
+            domain = request.url_root
+            if (not url.startswith("https://")) and (not url.startswith("http://")):
                 url = "https://" + url
 
             app.logger.info(f'POST request received for URL: {url}')
@@ -107,9 +110,6 @@ def short():
             return "Not a valid POST response", 400    
     else:
         return render_template("generated.html")
-
-
-black_shorts = ["new", "home", "website", "site", "about", "details", "contact"]
 
 @app.route(f"/{dir}/<short_url>")
 def redr_url(short_url):
