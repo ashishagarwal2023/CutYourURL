@@ -1,0 +1,50 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>URL Shorter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<!--<h1>URL Shorter</h1>-->
+<!--<form method="POST" action="{{ url_for('index') }}">-->
+<!--    <input type="text" name="url" placeholder="Enter URL to short">-->
+<!--    <button type="submit">Short</button>-->
+<!--</form>-->
+<main>
+    <section id="short">
+        <h1>CutYourURL.me - Free URL Shortener Service</h1>
+        <form action="{{ url_for('short') }}" method="post">
+            <div id="shortForm">
+                <input type="text" name="url" placeholder="Enter the link here">
+                <div id="submitBtn">
+                    <input type="submit" value="Cut!">
+                </div>
+            </div>
+        </form>
+        <p class="desc">CutYourURL is a free tool to generate short URLs for your links!<br>Made by ashishagarwal2023, open-source on GitHub.</p>
+    </section>
+    <section id="coming">
+        <h2>Coming soon...</h2>
+        <p class="desc">Custom short links, dashboard, API to short links, QR codes, custom-length links
+            codes, browser extension, app integrations and support</p>
+        <a class="comingBtn">Coming soon, stay tuned!</a><br><br>
+    </section>
+    <section id="content">
+        <h2>Powerful, light-weight, fast, free URL shortner</h2>
+        <p>
+            Built on Python, this is a simple yet powerful, light-weight, fast and free URL shortner.<br>It's currently under development, and is <a href="https://github.com" target="_blank">open-source</a> on GitHub. Coded by <a href="https://github.com/ashishagarwal2023" target="_blank">ashishagarwal2023</a>.
+        </p>
+        <h2>Why and What's coming?</h2>
+        <p>
+            This URL shortner service is based on a free 1-year NameCheap's student plan's custom domain. Neither it earn any profit for me, nor I got a credit card or bank account to recieve payments to, there are literally no ads, no data is shared, etc. To support me, just follow me on my <a href="https://github.com/ashishagarwal2023" target="_blank">GitHub</a>.
+            <br><br>
+            I am working to add authentication (using email, you can login and signup). Logged in users can do any of these things: dashboard showing all your generated shorts, delete shorts or change their redirect URL, track the number of peoples who got redirected from your short, a simple API to do this all again, a python package for it, QR codes automated generation, custom-length and custom-slug links and more.<br><br>I will be working on these features, however it currently has: free generation of links, redirection, logging (server-side logging).
+        </p>
+    </section>
+</main>
+</body>
+</html>
