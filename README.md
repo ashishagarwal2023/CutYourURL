@@ -7,6 +7,11 @@
 <p align="center"> 🤖 Shorten your links for free with a powerful interface!
     <br> 
 </p>
+<div align="center">
+
+[![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dashish_agarwal%26type%3Dpledges&style=flat)](https://patreon.com/ashish_agarwal)
+
+</div>
 
 ## 📝 Table of Contents
 
