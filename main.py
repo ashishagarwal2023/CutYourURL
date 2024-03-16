@@ -11,6 +11,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 
+dir = "s"
 log_file_path = "./cache/logs/shorts.log"
 log_dir = os.path.dirname(log_file_path)
 
@@ -69,7 +70,7 @@ def before_request():
 def index():
     return render_template("index.html")
 
-@app.route("/shorts/new", methods=["POST", "GET"])
+@app.route("/short", methods=["POST", "GET"])
 def short():
     if request.method == "POST":
         try:
@@ -86,8 +87,8 @@ def short():
 
             if existing_short_url:
                 cursor.close()
-                app.logger.debug(f'Returning existing short URL: /shorts/{existing_short_url[0]}\n')
-                return f"{request.url_root}{existing_short_url[0]}"
+                app.logger.debug(f'Returning existing short URL: /{dir}/{existing_short_url[0]}\n')
+                return f"{request.url_root}{dir}/{existing_short_url[0]}"
 
             short_url = gen_short()
             while True:
@@ -100,8 +101,8 @@ def short():
             cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url))
             db.commit()
             cursor.close()
-            app.logger.info(f'Generated new short URL: /shorts/{short_url}\n')
-            return f"{request.url_root}shorts/{short_url}"
+            app.logger.info(f'Generated new short URL: /{dir}/{short_url}\n')
+            return f"{request.url_root}s/{short_url}"
         except:
             return "Not a valid POST response", 400    
     else:
@@ -110,7 +111,7 @@ def short():
 
 black_shorts = ["new", "home", "website", "site", "about", "details", "contact"]
 
-@app.route("/shorts/<short_url>")
+@app.route(f"/{dir}/<short_url>")
 def redr_url(short_url):
     db = get_db()
     cursor = db.cursor()
