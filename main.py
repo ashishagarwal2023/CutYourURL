@@ -69,7 +69,7 @@ def before_request():
 def index():
     return render_template("index.html")
 
-@app.route("/short", methods=["POST", "GET"])
+@app.route("/shorts/new", methods=["POST", "GET"])
 def short():
     if request.method == "POST":
         try:
@@ -86,7 +86,7 @@ def short():
 
             if existing_short_url:
                 cursor.close()
-                app.logger.debug(f'Returning existing short URL: /{existing_short_url[0]}\n')
+                app.logger.debug(f'Returning existing short URL: /shorts/{existing_short_url[0]}\n')
                 return f"{request.url_root}{existing_short_url[0]}"
 
             short_url = gen_short()
@@ -100,13 +100,15 @@ def short():
             cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url))
             db.commit()
             cursor.close()
-            app.logger.info(f'Generated new short URL: /{short_url}\n')
-            return f"{request.url_root}{short_url}"
+            app.logger.info(f'Generated new short URL: /shorts/{short_url}\n')
+            return f"{request.url_root}shorts/{short_url}"
         except:
             return "Not a valid POST response", 400    
     else:
         return render_template("generated.html")
 
+
+black_shorts = ["new", "home", "website", "site", "about", "details", "contact"]
 
 @app.route("/shorts/<short_url>")
 def redr_url(short_url):
