@@ -43,6 +43,11 @@ a:hover {
 }
 br {
   clear: both;
+}.comingBtn, #submitBtn{
+  transition: 0.25s;
+}
+.comingBtn:hover, #submitBtn:hover{
+filter:opacity(0.9);
 }
 input[type="text"] {
   vertical-align: middle;
