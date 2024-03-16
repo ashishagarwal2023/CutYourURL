@@ -108,7 +108,7 @@ def short():
         return render_template("generated.html")
 
 
-@app.route("/<short_url>")
+@app.route("/shorts/<short_url>")
 def redr_url(short_url):
     db = get_db()
     cursor = db.cursor()
