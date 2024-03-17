@@ -72,7 +72,7 @@ def shortUrl(url, length):
             break
         short_url = gen_short(length)
 
-    cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url.lower()))
+    cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url))
     db.commit()
     cursor.close()
     return f"{dir_name}/{short_url}"
@@ -91,7 +91,7 @@ def index():
 def short():
     if request.method == "POST":
         try:
-            url = request.form.get("url").lower()
+            url = request.form.get("url")
             domain = request.url_root
             if valid.verify(url, domain):
                 pass
