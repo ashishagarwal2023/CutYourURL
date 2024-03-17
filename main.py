@@ -15,6 +15,7 @@ from flask import Flask, render_template, redirect, request, g
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
+import valid
 
 LOGS = log_file_path
 log_dir = os.path.dirname(log_file_path)
@@ -78,8 +79,10 @@ def short():
         try:
             url = request.form.get("url").lower()
             domain = request.url_root
-            if (not url.startswith("https://")) and (not url.startswith("http://")):
-                url = "https://" + url
+            if valid.verify(url, domain):
+                pass
+            else:
+                return "Invalid URL supplied", 400
 
             app.logger.info(f'POST request received for URL: {url}')
 
@@ -101,13 +104,13 @@ def short():
                     break
                 short_url = gen_short()
 
-            cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url))
+            cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url.lower()))
             db.commit()
             cursor.close()
             app.logger.info(f'Generated new short URL: /{dir}/{short_url}\n')
             return f"{request.url_root}s/{short_url}"
-        except:
-            return "Not a valid POST response", 400    
+        except Exception as e:
+            return f"Not a valid POST response {e}", 400    
     else:
         return render_template("generated.html")
 
@@ -115,16 +118,22 @@ def short():
 def redr_url(short_url):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('SELECT original_url FROM short_urls WHERE short_url=?', (short_url,))
-    url = cursor.fetchone()
-    cursor.close()
-
-    if url:
-        app.logger.info(f'Redirecting to original URL: {url[0]}')
-        return redirect(url[0])
+    cursor.execute('SELECT original_url, views FROM short_urls WHERE short_url=?', (short_url,))
+    url_info = cursor.fetchone()
+    
+    if url_info:
+        original_url, views = url_info
+        views += 1
+        cursor.execute('UPDATE short_urls SET views=? WHERE short_url=?', (views, short_url))
+        db.commit()
+        cursor.close()
+        print(views)
+        app.logger.info(f'Redirecting to original URL: {original_url}')
+        return redirect(original_url)
     else:
         app.logger.warning('Short URL not found')
         return "Not found", 404
+
 
 
 if __name__ == "__main__":
