@@ -57,7 +57,7 @@ def gen_short(length=6):
 def shortUrl(url, length):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('SELECT short_url FROM short_urls WHERE original_url=?', (url,))
+    cursor.execute('SELECT short_url FROM short_urls WHERE original_url=?', (url))
     existing_short_url = cursor.fetchone()
 
     if existing_short_url:
@@ -105,7 +105,7 @@ def short():
             full = f"{request.url_root}{short_url}"
             return render_template("generated.html", data=[full, url])
         except Exception as e:
-            return render_template("generated.html", data=["err", ""])
+            return render_template("generated.html", data=["exc", e])
     else:
         return render_template("generated.html", data=["err", ""])
 

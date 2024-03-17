@@ -94,7 +94,11 @@
             if(data[0] == "err"){
                 document.getElementsByClassName("error")[0].style.display = "block";
                 document.getElementsByClassName("done")[0].remove();
-            }else{
+            }else if(data[0] == "exc"){
+                alert("A server-side exception has been recieved, check console.");
+                console.log(data);
+            }
+            else{
                 var urlInput = document.getElementById("url");
 
                 urlInput.addEventListener("click", function () {
