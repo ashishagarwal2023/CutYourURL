@@ -1,21 +1,29 @@
-# CLI Script to INSERT records in the shorts (short urls) database.
 import sqlite3
 
-conn = sqlite3.connect('./../cache/shorts.db')
-cursor = conn.cursor()
+DB_PATH = './../cache/shorts.db'
 
-sql_insert = "INSERT INTO short_urls (short_url, original_url, views) VALUES (?, ?, 0)"
+def getAllData():
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM short_urls")
+        rows = cursor.fetchall()
+    return rows
 
-# Specify the values to be inserted
-values = [("tEsTsH", "https://example.com"),
-          ("anotherShort", "https://anotherexample.com")]
+def getQueryData(query):
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM short_urls {query}")
+        rows = cursor.fetchall()
+    return rows
 
-for value_set in values:
-    cursor.execute(sql_insert, value_set)
+def insertData(short_url, original_url, views=0):
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO short_urls (short_url, original_url, views) VALUES (?, ?, ?)", (short_url, original_url, views))
+        conn.commit()
 
-rows = cursor.fetchall()
+# Example usage with specified query
+query_result = getQueryData("WHERE ID = 2")
+print(query_result)
 
-for row in rows:
-    print(row)
-
-conn.close()
+# Example usage of insertData

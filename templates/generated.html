@@ -1,0 +1,116 @@
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CutYourURL.me - Free URL Shortener Service</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='gen.css') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+</head>
+
+<body>  
+    <main>
+        <section id="short" class="main error" style="display:none;">
+            <h1>An error occurred creating the short URL</h1>
+            <p>The URL has not been shortened, possible errors:</p>
+            <ul>
+                <li class="list">Check if the domain is correct</li>
+                <li class="list">The URL does not start with https:// or http://</li>
+                <li class="list">The URL is not valid</li>
+                <li class="list">The URL may have been blocked</li>
+                <li class="list">The URL may have been reported</li>
+                <li class="list">You tried to directly come here from a GET without data</li>
+                <li class="list">Check if the there is a typo</li>
+            </ul>
+            <br>
+            <p><a href="/" class="comingbtn">Go back and try again</a></p>
+        </section>
+        <section id="short" class="main done">
+            <h1>Your shortened URL</h1>
+            <p>
+                Copy your short link and share it in messages, texts, posts, websites and other locations.
+            </p>
+            <div id="shortForm" class="copyURL">
+                <input type="text" value="{{data.0}}" id="url" />
+                <div id="submitBtn">
+                    <input type="button" class="comingbtn copy" value="Copy URL" id="copyBtn" />
+                </div>
+            </div>
+            <div id="shortForm" class="block">
+                <p class="boxtextleft">
+                    Long URL:
+                    <a href="{{data.1}}"
+                        target="_blank">{{data.1}}</a><br>
+                    Total of clicks of your short URL (Coming Soon): 30<br>
+                    <p><a href="/" class="comingbtn">Short another URL!</a></p>
+                </p>
+            </div>
+        </section>
+        
+        <section id="content">
+            <h2>Why did I recieved "Invalid URL" error?</h2>
+            <p>
+                If you actually recieved, you would see the reasons listed. Read them up!
+                </p><p>
+                We use a python library called <a href="https://pypi.org/project/validators/" target="_blank">validators</a> that allows us to easily verify if your URL is valid or not. Here are the URLs that will be allowed:
+                <ul>
+                    <li class="yes">https://google.com</li>
+                    <li class="yes">https://google.com/</li>
+                    <li class="yes">https://www.google.com/</li>
+                    <li class="yes">https://google.com/search</li>
+                    <li class="yes">https://google.com/search?q=searchhere</li>
+                    <li class="yes">https://google.com/search?q=searchhere/</li>
+                    <li class="yes">https://google.com/search/?q=searchhere/</li>
+                </ul>
+                </p><p>
+                Several more should be accepted with different patterns. URL must start with https:// or http://.</p>
+                <ul>
+                    <li class="no">google.com</li>
+                    <li class="no">www.google.com</li>
+                    <li class="no">www.google</li>
+                    <li class="no">google</li>
+                    <li class="no">https:///google.com</li>
+                    <li class="no">https://google.com//</li>
+                    <li class="no">https:///google.com//</li>
+                </ul>
+                <p>
+            </p>
+            <h2>And what I do now?</h2>
+            <p>
+                Now as your URL has been shortened, you can directly copy it from here and then share it with your
+                friends!<br><br>
+                Please note that this is under development and it is possible for the short link to expire due to a bug
+                or new database, so please be careful, however I will try my best to not delete any data now and make
+                edits to current data on updates.
+            </p>
+        </section>
+        </main>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let data = {{ data | safe }};
+            if(data[0] == "err"){
+                document.getElementsByClassName("error")[0].style.display = "block";
+                document.getElementsByClassName("done")[0].remove();
+            }else{
+                var urlInput = document.getElementById("url");
+
+                urlInput.addEventListener("click", function () {
+                    this.select();
+                });
+
+                function copyLink() {
+                    var copyText = document.getElementById("url");
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(copyText.value);
+                    document.querySelector("#copyBtn").value = "Copied!";
+                }
+
+                document.getElementById("copyBtn").addEventListener("click", copyLink);}
+            });
+        </script>
+</body>
+
+</html>

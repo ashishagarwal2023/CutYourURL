@@ -1,59 +1,48 @@
-black_shorts = ["new", "home", "website", "site", "about", "details", "contact"]
-dir = "s"
-DATABASE = './cache/shorts.db'
-log_file_path = "./cache/logs/shorts.log"
-
-# Coded by ashishagarwal2023
-# Date initially published to GitHub: 17 March 2024 1AM
-# DO NOT COPY!
-
 import os
+import sys
 import random
 import string
 import sqlite3
-from flask import Flask, render_template, redirect, request, g
+from flask import Flask, render_template, redirect, request, g, url_for
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
 import valid
 
-LOGS = log_file_path
-log_dir = os.path.dirname(log_file_path)
+black_shorts = ["new", "home", "website", "site", "about", "details", "contact"]
+dir_name = "s"
+DATABASE = './cache/shorts.db'
+log_file_path = "./cache/logs/shorts.log"
 
+app = Flask(__name__)
+
+log_dir = os.path.dirname(log_file_path)
 os.makedirs(log_dir, exist_ok=True)
 
 if not os.path.exists(log_file_path):
     open(log_file_path, 'a').close()
-    print(f"Created log file: {log_file_path}")
- 
 
-app = Flask(__name__)
-print(f"Database at {DATABASE}, logging at {LOGS}")
 log_formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s', datefmt='%d %b %Y at %H:%M:%S')
-log_handler = TimedRotatingFileHandler(LOGS, when='midnight', interval=1, backupCount=30)
+log_handler = TimedRotatingFileHandler(log_file_path, when='midnight', interval=1, backupCount=30)
 log_handler.setFormatter(log_formatter)
 app.logger.addHandler(log_handler)
 app.logger.setLevel(logging.DEBUG)
 
-
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        try:
+            db = g._database = sqlite3.connect(DATABASE)
+        except sqlite3.OperationalError:
+            print("Found no database, migtht be deleted. Restoring database!")
+            os.execl(sys.executable, sys.executable, *sys.argv)
         db.execute('PRAGMA foreign_keys = ON')
     return db
-
 
 def close_db(exception=None):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
-
-
-def gen_short(length=6):
-    chars = string.ascii_letters + string.digits
-    return "".join(random.choice(chars) for _ in range(length))
-
 
 def init_db():
     db = get_db()
@@ -61,13 +50,38 @@ def init_db():
         db.cursor().executescript(f.read())
     db.commit()
 
+def gen_short(length=6):
+    chars = string.ascii_letters + string.digits
+    return "".join(random.choice(chars) for _ in range(length))
+
+def shortUrl(url, length):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT short_url FROM short_urls WHERE original_url=?', (url,))
+    existing_short_url = cursor.fetchone()
+
+    if existing_short_url:
+        cursor.close()
+        return f"{dir_name}/{existing_short_url[0]}"
+
+    short_url = gen_short(length)
+    while True:
+        cursor.execute('SELECT * FROM short_urls WHERE short_url=?', (short_url,))
+        existing_short_url = cursor.fetchone()
+        if not existing_short_url:
+            break
+        short_url = gen_short(length)
+
+    cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url.lower()))
+    db.commit()
+    cursor.close()
+    return f"{dir_name}/{short_url}"
 
 @app.before_request
 def before_request():
     if not getattr(g, '_got_first_request', None):
         init_db()
         g._got_first_request = True
-
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -82,59 +96,37 @@ def short():
             if valid.verify(url, domain):
                 pass
             else:
-                return "Invalid URL supplied", 400
+                return render_template("generated.html", data=["err", ""])
 
             app.logger.info(f'POST request received for URL: {url}')
 
-            db = get_db()
-            cursor = db.cursor()
-            cursor.execute('SELECT short_url FROM short_urls WHERE original_url=?', (url,))
-            existing_short_url = cursor.fetchone()
-
-            if existing_short_url:
-                cursor.close()
-                app.logger.debug(f'Returning existing short URL: /{dir}/{existing_short_url[0]}\n')
-                return f"{request.url_root}{dir}/{existing_short_url[0]}"
-
-            short_url = gen_short()
-            while True:
-                cursor.execute('SELECT * FROM short_urls WHERE short_url=?', (short_url,))
-                existing_short_url = cursor.fetchone()
-                if not existing_short_url:
-                    break
-                short_url = gen_short()
-
-            cursor.execute('INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)', (short_url, url.lower()))
-            db.commit()
-            cursor.close()
-            app.logger.info(f'Generated new short URL: /{dir}/{short_url}\n')
-            return f"{request.url_root}s/{short_url}"
+            short_url = shortUrl(url, 6)
+            app.logger.info(f'Generated new short URL: /{short_url}\n')
+            full = f"{request.url_root}{short_url}"
+            return render_template("generated.html", data=[full, url])
         except Exception as e:
-            return f"Not a valid POST response {e}", 400    
+            return render_template("generated.html", data=["err", ""])
     else:
-        return render_template("generated.html")
+        return render_template("generated.html", data=["err", ""])
 
-@app.route(f"/{dir}/<short_url>")
+@app.route(f"/{dir_name}/<short_url>")
 def redr_url(short_url):
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT original_url, views FROM short_urls WHERE short_url=?', (short_url,))
     url_info = cursor.fetchone()
-    
+
     if url_info:
         original_url, views = url_info
         views += 1
         cursor.execute('UPDATE short_urls SET views=? WHERE short_url=?', (views, short_url))
         db.commit()
         cursor.close()
-        print(views)
         app.logger.info(f'Redirecting to original URL: {original_url}')
         return redirect(original_url)
     else:
         app.logger.warning('Short URL not found')
-        return "Not found", 404
-
-
+        return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(debug=True)
