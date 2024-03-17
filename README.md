@@ -1,3 +1,5 @@
+> _Newest update:_ Now there are no more legacy returns, instead you see a page similiar to index.html.
+
 <p align="center">
   <a href="https://ashish2023.pythonanywhere.com/" rel="noopener">
  <img width=200px height=200px src="static/CutYourURL.png" alt="CutYourURL Logo"></a>
@@ -42,10 +44,12 @@ Based on Python-Flask. It saves your shortened URLs to a database and keeps logg
 ## Running locally
 ### Prerequisites
 
-Make venv yourself, then install the flask package.
+Make venv yourself, then install the flask package and `validators`.
 
 ```bash
-python3 -m pip install flask
+python3 -m pip install flask validators
+# or from file
+python3 -m pip install -r requirements.txt
 ```
 
 ### Running
