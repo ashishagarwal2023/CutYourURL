@@ -25,9 +25,9 @@
 
 I just wanted to have a cool project, and I made this. I also need to shorten some URLs, and bit.ly's URL shortner is good but not free and it requires me to have a account.
 
-For being lazy to login, I just made this. 🧐
+Just a project to include in my stack. Also, this domain is just a 1-year domain from GitHub Student Dev Pack, I'm not sure where would I move it after it expires.
 
-Just a party to include in my full-stack list. Also, this domain is just a 1-year domain from GitHub Student Dev Pack, I'm not sure where would I move it after it expires.
+> For information about every commits (not all, but new feature ones), there is a updates.md file.
 
 ## 🎥 Demo / Working <a name = "demo"></a>
 
