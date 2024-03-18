@@ -10,6 +10,18 @@
 </head>
 <body>
 <main>
+        {% if True %}
+        <section id="short" class="main log">
+            {% if username.strip() == '' %}
+        <h2>Welcome, Guest!</h2>
+        <p>You are a guest. Please log in or sign up to access free custom shorts, dashboard, QR codes and more! <a href="/login">Signup or Login here</a></p>
+    {% else %}
+        <h2>Welcome, {{ username }}!</h2>
+        <p>You are currently logged in as {{username}}. You are given the free perks to make custom shorts, click tracking and whatever is upcoming!</p>
+        <a class="logoutBtn" href="/logout">Logout?</a><br><br>
+    {% endif %}
+        </section>
+        {% endif %}
     <section id="short" class="main">
         <h1>CutYourURL.me - Free URL Shortener Service</h1>
         <form action="{{ url_for('short') }}" method="post">

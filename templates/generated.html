@@ -43,7 +43,7 @@
                     Long URL:
                     <a href="{{data.1}}"
                         target="_blank">{{data.1}}</a><br>
-                    Total of clicks of your short URL (Coming Soon): 30<br>
+                    Total of clicks of your short URL: {{data.2}}<br>
                     <p><a href="/" class="comingbtn">Short another URL!</a></p>
                 </p>
             </div>
@@ -91,31 +91,36 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 let data = {{ data | safe }};
-            if(data[0] == "err"){
-                document.getElementsByClassName("error")[0].style.display = "block";
-                document.getElementsByClassName("done")[0].remove();
-            }else if(data[0] == "exc"){
-                alert("A server-side exception has been recieved, check console.");
                 console.log(data);
-            }
-            else{
-                var urlInput = document.getElementById("url");
-
-                urlInput.addEventListener("click", function () {
-                    this.select();
-                });
-
-                function copyLink() {
-                    var copyText = document.getElementById("url");
-                    copyText.select();
-                    copyText.setSelectionRange(0, 99999);
-                    navigator.clipboard.writeText(copyText.value);
-                    document.querySelector("#copyBtn").value = "Copied!";
+        
+                if (data[0] == "err") {
+                    document.getElementsByClassName("error")[0].style.display = "block";
+                    document.getElementsByClassName("done")[0].remove();
+                } else if (data[0] == "exc") {
+                    console.log("Server-side error occured.");
+                    document.getElementsByClassName("error")[0].style.display = "block";
+                    document.getElementsByClassName("done")[0].remove();
+                    document.querySelector("#short.main.error ul").innerHTML = `<li class="list">A server-side error has been noticed, sorry. Please come back later!</li>`;
+                } else{
+                    var urlInput = document.getElementById("url");
+        
+                    urlInput.addEventListener("click", function () {
+                        this.select();
+                    });
+        
+                    function copyLink() {
+                        var copyText = document.getElementById("url");
+                        copyText.select();
+                        copyText.setSelectionRange(0, 99999);
+                        navigator.clipboard.writeText(copyText.value);
+                        document.querySelector("#copyBtn").value = "Copied!";
+                    }
+        
+                    document.getElementById("copyBtn").addEventListener("click", copyLink);
                 }
-
-                document.getElementById("copyBtn").addEventListener("click", copyLink);}
             });
         </script>
+        
 </body>
 
 </html>
