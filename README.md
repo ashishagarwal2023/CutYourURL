@@ -42,11 +42,9 @@ Based on Python-Flask. It saves your shortened URLs to a database and keeps logg
 ## Running locally
 ### Prerequisites
 
-Make venv yourself, then install the flask package and `validators`.
+Make venv yourself, then install the packages.
 
 ```bash
-python3 -m pip install flask validators
-# or from file
 python3 -m pip install -r requirements.txt
 ```
 
@@ -56,9 +54,30 @@ python3 -m pip install -r requirements.txt
 python3 main.py
 ```
 
+## Common Errors
+It should not do any errors, and to prevent errors by the versions of new packages, I've specificed my version of all packages I'm using that is stable. However, theres still some errors:
+### Cannot Access DB
+This error will occur if Python cannot open the DB under `./cache/login.db`. If you deleted the cache folder, it is not a issue, you can re-make it.
+> It will try to make ./cache/shorts.db automatically, but after running it and having login.db you don't have shorts.db, you might manually create one.
+
+To re-make the login.db, you have to do:
+```bash
+# sudo apt install sqlite3
+$ sqlite3 login.db < login.sql # install if not installed from apt
+
+# then move login.db to cache
+$ mv ./login.db ./cache/
+
+# if u need to restore the shorts.db, similiarly:
+$ sqlite3 shorts.db < schema.sql
+$ mv ./shorts.db ./cache/
+```
+Make sure you have installed all dependencies too!
+
 ## ✍️ Authors <a name = "authors"></a>
 
 - [@ashishagarwal2023](https://github.com/ashishagarwal2023) - Idea & Initial work
+- [@N3RDIUM](https://github.com/N3RDIUM) - Leaving me at the half back-end of login 🤣
 
 See also the list of [contributors](https://github.com/ashishagarwal2023/cutyoururl/contributors) who participated in this project.
 

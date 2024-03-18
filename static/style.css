@@ -11,10 +11,16 @@ body {
   font: 14px asap, arial;
 }
 @media (prefers-color-scheme: dark) {
-  body{
+  body {
     background-color: #0a0a0a;
-  background-image: radial-gradient(at 47% 33%, hsl(299.39, 0%, 39%) 0, transparent 59%), radial-gradient(at 82% 65%, hsl(195.26, 0%, 22%) 0, transparent 55%);
-  }}
+    background-image: radial-gradient(
+        at 47% 33%,
+        hsl(299.39, 0%, 39%) 0,
+        transparent 59%
+      ),
+      radial-gradient(at 82% 65%, hsl(195.26, 0%, 22%) 0, transparent 55%);
+  }
+}
 h1 {
   margin: 0 0 -10px 0;
   font: bold 36px asap, arial;
@@ -43,11 +49,16 @@ a:hover {
 }
 br {
   clear: both;
-}.comingBtn, #submitBtn, .logoutBtn{
+}
+.comingBtn,
+#submitBtn,
+.logoutBtn {
   transition: 0.25s;
 }
-.comingBtn:hover, #submitBtn:hover, .logoutBtn:hover{
-filter:opacity(0.9);
+.comingBtn:hover,
+#submitBtn:hover,
+.logoutBtn:hover {
+  filter: opacity(0.9);
 }
 input[type="text"] {
   vertical-align: middle;
@@ -84,14 +95,15 @@ input[type="submit"] {
   margin: 0 0 5px 0;
   cursor: pointer;
 }
-.comingBtn:hover , .logoutBtn:hover{
+.comingBtn:hover,
+.logoutBtn:hover {
   text-decoration: none;
-
-}@media (prefers-color-scheme: dark) {
-
-main{
-  background-color: rgb(221 221 221 / 76%);
-}}
+}
+@media (prefers-color-scheme: dark) {
+  main {
+    background-color: rgb(221 221 221 / 76%);
+  }
+}
 main {
   display: block;
   margin: 0 auto 0 auto;
@@ -114,7 +126,7 @@ section#short {
   border: 1px solid rgba(209, 213, 219, 0.3);
   text-align: center;
 }
-.log{
+.log {
   text-align: left !important;
 }
 section#short h1 {
@@ -191,7 +203,11 @@ section#coming {
   border-radius: 12px;
   text-align: center;
 }
-section#coming h2 {
+section.recents {
+  padding: 10px 0 0 !important;
+}
+
+section#coming h2{
   margin: 15px auto 20px auto;
 }
 html {
@@ -232,7 +248,7 @@ input[name="submit"] {
   text-align: right;
 }
 * {
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 @media all and (max-width: 1000px) {
   html {
@@ -241,6 +257,26 @@ input[name="submit"] {
   }
 }
 
-section#short.main{
+section#short.main {
   margin-top: 30px;
+}
+table,
+th,
+td {
+  border: 1px solid #ccc;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #ddd;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #f0f0f0;
 }

@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS short_urls (
     short_url TEXT UNIQUE,
     original_url TEXT,
     views INTEGER DEFAULT 0,
-    length INTEGER GENERATED ALWAYS AS (LENGTH(short_url)) STORED
+    length INTEGER GENERATED ALWAYS AS (LENGTH(short_url)) STORED,
+    inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

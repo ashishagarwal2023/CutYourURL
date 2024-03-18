@@ -9,6 +9,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import valid
 import flask_login as fl
+import recent
 login_manager = fl.LoginManager()
 
 LOGIN_DB = "./cache/login.db"
@@ -18,20 +19,6 @@ DATABASE = './cache/shorts.db'
 log_file_path = "./cache/logs/shorts.log"
 SCHEMA_FILE = "./login.sql"
 
-def create_login_db():
-    if not os.path.exists(LOGIN_DB):
-        with sqlite3.connect(LOGIN_DB) as conn:
-            cursor = conn.cursor()
-            with open(SCHEMA_FILE, 'r') as schema_file:
-                schema = schema_file.read()
-                cursor.executescript(schema)
-                conn.commit()
-        print("Login database created successfully.")
-    else:
-        print("Login database already exists.")
-
-create_login_db()
-
 with sqlite3.connect(LOGIN_DB) as db:
     cursor = db.cursor()
     q = "SELECT * FROM users"
@@ -40,7 +27,7 @@ with sqlite3.connect(LOGIN_DB) as db:
     
 app = Flask(__name__)
 login_manager.init_app(app)
-app.secret_key = 'super secret string' 
+app.secret_key = 'tBwMEtArOWakISWGAfJzDJL8IPzMu9j0' 
 
 class User(fl.UserMixin):
     def __init__(self, username):
@@ -67,7 +54,6 @@ def request_loader(request):
 
 log_dir = os.path.dirname(log_file_path)
 os.makedirs(log_dir, exist_ok=True)
-create_login_db()
 
 if not os.path.exists(log_file_path):
     open(log_file_path, 'a').close() 
@@ -141,7 +127,7 @@ def index():
     else:
         username = ""
 
-    return render_template("index.html", username=username)
+    return render_template("index.html", username=username, recents=recent.recents(6))
 
 @app.route("/short", methods=["POST", "GET"])
 def short():
