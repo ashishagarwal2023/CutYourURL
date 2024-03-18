@@ -276,6 +276,11 @@ def logout():
         fl.logout_user()
     return redirect("/") # To the homepage
 
+# The 404 page
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect("/") # 404 to homepage
+
 if __name__ == "__main__":
     app.logger.info(f'App is running\n')
     app.run(debug=False)
