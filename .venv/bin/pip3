@@ -1,4 +1,4 @@
-#!/home/ashish/Git/CutYourURL-Updated/.venv/bin/python
+#!/home/ashish/Git/CutYourURL/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

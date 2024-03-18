@@ -11,6 +11,7 @@ from logging.handlers import TimedRotatingFileHandler
 import valid
 import flask_login as fl
 import recent
+from qr import qr
 
 login_manager = fl.LoginManager()
 
@@ -139,6 +140,7 @@ def before_request():
 # Homepage
 @app.route("/", methods=["GET", "POST"])
 def index():
+    return redirect(qr("hello there"))
     if fl.current_user.is_authenticated:
         username = fl.current_user.id
     else:
