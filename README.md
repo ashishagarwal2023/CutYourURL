@@ -1,6 +1,3 @@
-> Backup branch for v 0.1.3
-> _Newest update:_ Now there are no more legacy returns, instead you see a page similiar to index.html.
-
 <p align="center">
   <a href="https://ashish2023.pythonanywhere.com/" rel="noopener">
  <img width=200px height=200px src="static/CutYourURL.png" alt="CutYourURL Logo"></a>
