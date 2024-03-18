@@ -38,14 +38,23 @@
                     <input type="button" class="comingbtn copy" value="Copy URL" id="copyBtn"/>
                 </div>
             </div>
-            <div id="shortForm" class="block">
-                <p class="boxtextleft">
-                    Long URL:
-                    <a href="{{data.1}}"
-                        target="_blank">{{data.1}}</a><br>
-                    Total of clicks of your short URL: {{data.2}}<br>
-                    <p><a href="/" class="comingbtn">Short another URL!</a></p>
-                </p>
+            <div id="shortForm" class="block qrCon">
+                <div class="container">
+                    <div class="content">
+                      <p class="qr">Your Short QR: </p>
+                      <p class="qr">
+                        Long URL:
+                        <a href="{{data.1}}"
+                            target="_blank">{{ cutText(data.1, 30) }}</a><br>
+                        Total of clicks of your short URL: {{data.2}}<br>
+                        <p class="qr"><a href="/" class="comingbtn">Short another URL!</a></p>
+                    </p>
+                    </div>
+                    <div class="image-container">
+                      <img id="qr" alt="Auto-generated Short QR Code of your URL" class="alignRight" src="{{data.3}}">
+                    </div>
+                  </div>
+                  
             </div>
         </section>
         

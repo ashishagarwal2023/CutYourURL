@@ -1,6 +1,9 @@
 # 18 March 2024:
 ## What is added
 Today were like 8+ commits done, these features were added:
+- QR Codes for each short link are now generated!
+- Shown links are now splited, so very-very-very long links won't overflow your screen. (They are trimmed/cropped now)
+- Some extra logging: attempting to redirect to short of ID, etc
 - Template for user (when they are logged in or are guest, shows always on / route)
 - Template for recent shorts (on / route)
 

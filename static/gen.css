@@ -59,3 +59,40 @@ ul {
   margin: 0;
   padding: 0;
 }
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content {
+  flex-grow: 1;
+}
+
+p.qr {
+  text-align: left;
+}
+
+.alignRight {
+  float: right;
+  margin-left: 10px;
+}
+
+.qrCon {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    display: block;
+  }
+
+  .alignRight {
+    float: none; 
+    margin-left: 0; 
+  }
+
+  p.qr {
+    text-align: center;
+  }
+}

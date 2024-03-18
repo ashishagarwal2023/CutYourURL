@@ -9,7 +9,7 @@ def qr(text, qr_color="orange", back_color="white", logo_path="./static/qrlogo.p
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=10,
-        border=2,
+        border=0,
     )
     qr.add_data(text)
     qr.make(fit=True)

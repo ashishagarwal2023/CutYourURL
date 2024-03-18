@@ -34,6 +34,13 @@ app = Flask(__name__)
 login_manager.init_app(app)
 app.secret_key = 'tBwMEtArOWakISWGAfJzDJL8IPzMu9j0' # Change this if you want!
 
+def cutText(text, length):
+    if len(text) <= length:
+        return text
+    else:
+        return text[:(length-3)] + "..."
+
+
 # User class
 class User(fl.UserMixin):
     def __init__(self, username):
@@ -140,13 +147,12 @@ def before_request():
 # Homepage
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return redirect(qr("hello there"))
     if fl.current_user.is_authenticated:
         username = fl.current_user.id
     else:
-        username = "" # Modifying this could grant every Guests a access to a account, however it will occur errors at some conditions too
+        username = "" # Guest username, is trimmed on client-side
 
-    return render_template("index.html", username=username, recents=recent.recents(5)) # Recent shorts are supplied and username is too
+    return render_template("index.html", username=username, recents=recent.recents(5), cutText=cutText) # Recent shorts are supplied and username is too
 
 @app.route("/short", methods=["POST", "GET"]) # Route where links are shorted
 def short():
@@ -158,7 +164,7 @@ def short():
                 pass # The given URL is valid, we can continue to shorten it
             else:
                 # The given URL is not valid, we can not continue with such a URL.
-                return render_template("generated.html", data=["err", "", 0])
+                return render_template("generated.html", data=["err", "", 0],cutText=cutText)
             db = get_db()
             Vcursor = db.cursor()
             Vcursor.execute('SELECT views FROM short_urls WHERE original_url=?', (url,))
@@ -173,14 +179,19 @@ def short():
                 app.logger.info(f'Returning already-generated URL: /{short_url}\n')
             full = f"{request.url_root}{short_url}" # Generates a URL like http://127.0.0.1:5000/s/4n8MSl
             views = views[0] if views else 0
-            return render_template("generated.html", data=[full, url, views]) # Success
+            qrURI = qr(full)
+            app.logger.info(f'Generated QR Code URI from: {full}\n')
+            return render_template("generated.html", data=[full, url, views, qrURI],cutText=cutText) # Success
         except Exception as e:
+            app.logger.error(f'Server exception during shorting: {e}\n')
             return render_template("generated.html", data=["exc", e]) # Server exception
     else:
+        app.logger.error(f'GET request received without parameters for /short\n')
         return render_template("generated.html", data=["err", ""]) # GET without parameters, client error.
 
 @app.route(f"/{dir_name}/<short_url>") # Route where short URLs are redirected to their original URLs
 def redr_url(short_url):
+    app.logger.info(f'Recieved to redirect for short with ID: {short_url}\n')
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT original_url, views FROM short_urls WHERE short_url=?', (short_url,))
@@ -197,7 +208,7 @@ def redr_url(short_url):
         app.logger.info(f'Redirecting to original URL: {original_url}')
         return redirect(original_url) # Redirects
     else:
-        app.logger.warning('Short URL not found')
+        app.logger.error('Short URL not found')
         return redirect("/") # If the Short URL doesn't exist, we will simply redirect to the homepage.
 
 # The login route
@@ -266,4 +277,5 @@ def logout():
     return redirect("/") # To the homepage
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.logger.info(f'App is running\n')
+    app.run(debug=False)
