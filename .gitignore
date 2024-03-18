@@ -130,4 +130,3 @@ dmypy.json
 
 # Cache is the DATABASE, if you sync it on github, you are leaking your short urls but we will make another DB login.db in this folder too, so also do not sync it, and LOGS
 cache/
-.venv/
