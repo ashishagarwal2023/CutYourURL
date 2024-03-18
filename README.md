@@ -68,6 +68,8 @@ $ sqlite3 login.db < login.sql # install if not installed from apt
 # then move login.db to cache
 $ mv ./login.db ./cache/
 
+# a login
+
 # if u need to restore the shorts.db, similiarly:
 $ sqlite3 shorts.db < schema.sql
 $ mv ./shorts.db ./cache/

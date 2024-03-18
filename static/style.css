@@ -280,3 +280,7 @@ table {
   border-collapse: collapse;
   background-color: #f0f0f0;
 }
+section.recents p{
+  text-align: center;
+  padding-bottom: 15px;
+}

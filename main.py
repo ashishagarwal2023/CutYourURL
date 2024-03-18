@@ -127,7 +127,7 @@ def index():
     else:
         username = ""
 
-    return render_template("index.html", username=username, recents=recent.recents(6))
+    return render_template("index.html", username=username, recents=recent.recents(5))
 
 @app.route("/short", methods=["POST", "GET"])
 def short():
