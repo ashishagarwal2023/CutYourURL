@@ -1,98 +1,93 @@
 .block {
-  display: block !important;
+	display: block !important;
 }
+
 .copyURL {
-  max-width: 450px !important;
+	max-width: 450px !important;
 }
-#balloon {
-  background: #333;
-  font: 13px asap, arial;
-  color: #fff;
-  padding: 8px;
-  text-align: center;
-  border-radius: 3px;
-  white-space: nowrap;
-  float: right;
-  margin: 4px 0 4px 4px;
-}
+
 .btn {
-  display: inline-block;
-  background-color: #2c87c5;
-  font: normal 16px lato, arial;
-  color: #fff;
-  padding: 7px 16px;
-  border: 0;
-  border-radius: 3px;
-  text-decoration: none;
-  margin: 0 0 5px 0;
-  height: 36px;
+	display: inline-block;
+	background-color: #2c87c5;
+	font: normal 16px lato, arial;
+	color: #fff;
+	padding: 7px 16px;
+	border: 0;
+	border-radius: 3px;
+	text-decoration: none;
+	margin: 0 0 5px 0;
+	height: 36px;
 }
+
 .list {
-  line-height: 1.5;
-  background: url(../static/icon-tick.svg) no-repeat left;
-  padding: 0 0 0 35px;
+	line-height: 1.5;
+	background: url(../static/icon-tick.svg) no-repeat left;
+	padding: 0 0 0 35px;
 }
+
 .yes {
-  line-height: 1.5;
-  background: url(../static/icon-tick-green.svg) no-repeat left;
-  padding: 0 0 0 35px;
+	line-height: 1.5;
+	background: url(../static/icon-tick-green.svg) no-repeat left;
+	padding: 0 0 0 35px;
 }
+
 .no {
-  line-height: 1.5;
-  background: url(../static/icon-x.svg) no-repeat left;
-  padding: 0 0 0 35px;
+	line-height: 1.5;
+	background: url(../static/icon-x.svg) no-repeat left;
+	padding: 0 0 0 35px;
 }
 
 li {
-  font: 17px "source sans pro", arial;
-  color: #202020;
-  line-height: 1.5;
-  text-align: left;
+	font: 17px "source sans pro", arial;
+	color: #202020;
+	line-height: 1.5;
+	text-align: left;
 }
 
 ul {
-  font: 17px "source sans pro", arial;
-  color: #202020;
-  line-height: 1.5;
-  text-align: left;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+	font: 17px "source sans pro", arial;
+	color: #202020;
+	line-height: 1.5;
+	text-align: left;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
+
 .container {
-  display: flex;
-  justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 }
 
 .content {
-  flex-grow: 1;
+	flex-grow: 1;
 }
 
 p.qr {
-  text-align: left;
+	text-align: left;
 }
 
 .alignRight {
-  float: right;
-  margin-left: 10px;
+	float: right;
+	margin-left: 10px;
 }
 
 .qrCon {
-  padding-top: 20px;
-  padding-bottom: 20px;
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
 
 @media (max-width: 600px) {
-  .container {
-    display: block;
-  }
+	.container {
+		display: block;
+	}
 
-  .alignRight {
-    float: none; 
-    margin-left: 0; 
-  }
+	.alignRight {
+		float: none;
+		margin-left: 0;
+	}
 
-  p.qr {
-    text-align: center;
-  }
+	p.qr {
+		text-align: center;
+	}
 }

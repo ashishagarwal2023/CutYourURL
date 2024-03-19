@@ -1,0 +1,17 @@
+{% block contents %}
+	<form action="{{ url_for('short') }}" method="post">
+		<div id="shortForm">
+			<input type="text" name="url" placeholder="Enter the link here">
+			<div id="submitBtn">
+				<input type="submit" value="Cut!">
+			</div>
+		</div>
+		<p>
+		<details>
+			<summary>Advanced Options:</summary>
+			<label for="captcha">Enable Captcha Security? </label>
+			<input type="checkbox" id="captcha" name="captcha">
+		</details>
+		</p>
+	</form>
+{% endblock %}

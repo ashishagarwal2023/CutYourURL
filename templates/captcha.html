@@ -1,13 +1,91 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
+	<title>CutYourURL.tech - Verify You Are Human</title>
 	<meta charset="UTF-8">
 	<meta name="viewport"
 		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Document</title>
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f5f7fa;
+			margin: 0;
+			padding: 0;
+		}
+
+		.container {
+			max-width: 600px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #fff;
+			border-radius: 5px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			text-align: center;
+		}
+
+		h1 {
+			font-size: 24px;
+			margin-bottom: 20px;
+		}
+
+		p {
+			font-size: 16px;
+			margin-bottom: 20px;
+		}
+
+		.captcha {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.msg.verifying {
+			color: rgb(158, 62, 7);
+		}
+
+		.success {
+			color: rgb(15, 180, 0);
+		}
+	</style>
 </head>
 <body>
-
+<div class="container">
+	<h1>Verify You Are Human</h1>
+	<p>Please complete the captcha below to continue.</p>
+	<div class="captcha">
+		<div class="g-recaptcha" data-sitekey="{{ captchaKey }}" data-callback="captchaDone"
+			 data-action="action"></div>
+	</div>
+	<p>
+		<span class="msg verifying" id="msg">Verify captcha to proceed</span>
+	</p>
+</div>
+<br>
+<div class="container">
+	Security provided by <a href="https://cutyoururl.tech/">CutYourURL.tech</a>, free URL shortening service
+</div>
+<script>
+	var captchaDone = function (response) {
+		const msg = document.getElementById('msg');
+		msg.innerHTML = 'Captcha verified, processing...';
+		msg.classList.remove('verifying');
+		msg.classList.add('success');
+		setTimeout(() => {
+			fetch('/captcha', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				body: `short_url={{ short_id }}`
+			}).then(response => response.text())
+				.then(url => {
+					window.location.href = url;
+				});
+		}, 1200);
+	};
+</script>
 </body>
 </html>

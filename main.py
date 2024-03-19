@@ -32,6 +32,9 @@ dir_name = "s"
 DATABASE = "./cache/shorts.db"
 log_file_path = "./cache/logs/shorts.log"
 SCHEMA_FILE = "./login.sql"
+captchaSiteKey = (
+    "6LcuA54pAAAAAIqHROKzlEoTPA7G4KMxvluzDZpl"  # Google reCAPTCHA v2 site key
+)
 
 # Load DB
 with sqlite3.connect(LOGIN_DB) as db:
@@ -135,7 +138,7 @@ def gen_short(length=6):
 
 # After a short URL id is made, this function holds the further tasks
 # Like to add the URL to database, check if it already exists.
-def shortUrl(url, length):
+def shortUrl(url, length, captcha):
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
@@ -153,12 +156,13 @@ def shortUrl(url, length):
             break
         short_url = gen_short(length)
 
+    captcha_enabled = False
+    if int(captcha) == 1:
+        captcha_enabled = True
+
     cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url) VALUES (?, ?)",
-        (
-            short_url,
-            url,
-        ),
+        "INSERT INTO short_urls (short_url, original_url, captcha) VALUES (?, ?, ?)",
+        (short_url, url, captcha_enabled),
     )
     db.commit()
     cursor.close()
@@ -188,16 +192,22 @@ def index():
 
 @app.route("/short", methods=["POST", "GET"])  # Route where links are shorted
 def short():
+    username = ""
+    if fl.current_user.is_authenticated:
+        username = fl.current_user.id
     if request.method == "POST":
         try:
             url = request.form.get("url")
+            captchaEnabled = "captcha" in request.form
             domain = request.url_root
             if valid.verify(url, domain):
                 pass  # The given URL is valid, we can continue to shorten it
             else:
                 # The given URL is not valid, we can not continue with such a URL.
                 return render_template(
-                    "generated.html", data=["err", "", 0], cutText=cutText
+                    "generated.html",
+                    data=["err", ""],
+                    username=username,
                 )
             db = get_db()
             Vcursor = db.cursor()
@@ -208,7 +218,7 @@ def short():
 
             app.logger.info(f"POST request received for URL: {url}")
 
-            short_url = shortUrl(url, 6)
+            short_url = shortUrl(url, 6, captcha=captchaEnabled)
             if views == None:  # None means its just generated
                 app.logger.info(f"Generated new short URL: /{short_url}\n")
             else:  # Already existed
@@ -217,37 +227,55 @@ def short():
             views = views[0] if views else 0
             qrURI = qr(full)
             app.logger.info(f"Generated QR Code URI from: {full}\n")
+            croppedURL = cutText(url, 30)
             return render_template(
-                "generated.html", data=[full, url, views, qrURI], cutText=cutText
+                "generated.html",
+                full=full,
+                url=url,
+                views=views,
+                qrURI=qrURI,
+                username=username,
+                captchaEnabled=captchaEnabled,
+                cropped=croppedURL,
             )  # Success
         except Exception as e:
             app.logger.error(f"Server exception during shorting: {e}\n")
+            print(e)
             return render_template(
-                "generated.html", data=["exc", e]
+                "generated.html",
+                data=["exc"],
+                username=username,
+                cropped="",
             )  # Server exception
     else:
         app.logger.error(f"GET request received without parameters for /short\n")
         return render_template(
-            "generated.html", data=["err", ""]
+            "generated.html", data=["err", ""], username=username, cutText=cutText
         )  # GET without parameters, client error.
 
 
-@app.route(
-    f"/{dir_name}/<short_url>"
-)  # Route where short URLs are redirected to their original URLs
+@app.route(f"/{dir_name}/<short_url>")
 def redr_url(short_url):
     app.logger.info(f"Recieved to redirect for short with ID: {short_url}\n")
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT original_url, views FROM short_urls WHERE short_url=?", (short_url,)
+        "SELECT original_url, views, captcha FROM short_urls WHERE short_url=?",
+        (short_url,),
     )
-    # Gets the original URL and views
     url_info = cursor.fetchone()
 
     if url_info:
-        original_url, views = url_info
-        views += 1  # Increase view count by 1
+        original_url, views, captcha = url_info
+        if captcha:
+            app.logger.info(f"Redirecting to captcha page for short URL: {short_url}")
+            return render_template(
+                "captcha.html",
+                redirectURL=original_url,
+                captchaKey=captchaSiteKey,
+                short_id=short_url,
+            )
+        views += 1
         cursor.execute(
             "UPDATE short_urls SET views=? WHERE short_url=?",
             (
@@ -255,23 +283,20 @@ def redr_url(short_url):
                 short_url,
             ),
         )
-        # Updates the view count
         db.commit()
         cursor.close()
         app.logger.info(f"Redirecting to original URL: {original_url}")
-        return redirect(original_url)  # Redirects
+        return redirect(original_url)
     else:
         app.logger.error("Short URL not found")
-        return redirect(
-            "/"
-        )  # If the Short URL doesn't exist, we will simply redirect to the homepage.
+        return redirect("/")
 
 
 # The login route
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if flask.request.method == "GET" and not fl.current_user.is_authenticated:
-        return render_template("login.html", data="null")
+        return render_template("login.html", error="null")
     # GET requests are when someone comes there without any data, like opened from address bar or bookmark or jumped
     if not fl.current_user.is_authenticated:
         username = flask.request.form["username"]
@@ -292,7 +317,7 @@ def login():
             return flask.redirect("/")  # Redirect to home after being logged in
 
         return render_template(
-            "login.html", data=0
+            "login.html", error=0
         )  # The password or username is invalid.
     return redirect("/")  # The user is already logged in
 
@@ -307,7 +332,7 @@ def signup():
 
         if password != confirm_password:  # Passwords are not equal
             return render_template(
-                "login.html", data=1
+                "login.html", error=1
             )  # Client Error : Passwords do not match
 
         db = sqlite3.connect(LOGIN_DB)
@@ -318,7 +343,7 @@ def signup():
         count = cursor.fetchone()[0]
         if count > 0:
             return render_template(
-                "login.html", data=2
+                "login.html", error=2
             )  # Client Error : Username taken
 
         # Insert the new user record
@@ -351,6 +376,34 @@ def logout():
 @app.errorhandler(404)
 def page_not_found(e):
     return redirect("/")  # 404 to homepage
+
+
+@app.route("/captcha", methods=["POST"])
+def captcha():
+    short_url = flask.request.form["short_url"]
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT original_url, views FROM short_urls WHERE short_url=?",
+        (short_url,),
+    )
+    url_info = cursor.fetchone()
+
+    if url_info:
+        original_url, views = url_info
+        views += 1
+        cursor.execute(
+            "UPDATE short_urls SET views=? WHERE short_url=?",
+            (
+                views,
+                short_url,
+            ),
+        )
+        db.commit()
+        cursor.close()
+        return original_url
+    else:
+        return redirect("/")
 
 
 if __name__ == "__main__":

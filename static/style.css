@@ -145,6 +145,13 @@ section#short {
 	text-align: center;
 }
 
+main p details summary, main p details, main p details input, details {
+	padding: 2px;
+	margin: 5px;
+	text-align: left;
+	line-height: 1.9;
+}
+
 .log {
 	text-align: left !important;
 }
