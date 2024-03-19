@@ -29,7 +29,7 @@ with sqlite3.connect(LOGIN_DB) as db:
     q = "SELECT * FROM users"
     cursor.execute(q, ())
     users = cursor.fetchall()
-    
+
 app = Flask(__name__)
 login_manager.init_app(app)
 app.secret_key = 'tBwMEtArOWakISWGAfJzDJL8IPzMu9j0' # Change this if you want!
@@ -49,7 +49,7 @@ class User(fl.UserMixin):
         q = "SELECT * FROM users WHERE username = ?"
         user = cursor.execute(q, (username,)).fetchone()
         self.id = username
-    
+
 
 # Flask_login related tasks for Login/Signup
 @login_manager.user_loader
@@ -72,7 +72,7 @@ os.makedirs(log_dir, exist_ok=True)
 
 # Make log file
 if not os.path.exists(log_file_path):
-    open(log_file_path, 'a').close() 
+    open(log_file_path, 'a').close()
 
 # Initialize logging
 log_formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s', datefmt='%d %b %Y at %H:%M:%S')
@@ -249,7 +249,7 @@ def signup():
 
         db = sqlite3.connect(LOGIN_DB)
         cursor = db.cursor()
-        
+
         # Check if the username already exists
         cursor.execute('SELECT COUNT(*) FROM users WHERE username=?', (username,))
         count = cursor.fetchone()[0]
@@ -258,7 +258,7 @@ def signup():
 
         # Insert the new user record
         cursor.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (username, email, password)) # Signed up
-        user = User(username) 
+        user = User(username)
         user.id = username
         fl.login_user(user) # Login
         db.commit() # The account has been created and logged in now.
@@ -281,6 +281,5 @@ def logout():
 def page_not_found(e):
     return redirect("/") # 404 to homepage
 
-if __name__ == "__main__":
-    app.logger.info(f'App is running\n')
-    app.run(debug=False)
+if __name__ == '__main__':
+    app.run(debug=True, port=os.getenv("PORT", default=5000))

@@ -1,5 +1,6 @@
 Flask==3.0.2
 validators==0.22.0
 flask_login==0.6.3
-Pillow
-qrcode
+Pillow==10.2.0
+qrcode==7.4.2
+gunicorn==21.2.0
