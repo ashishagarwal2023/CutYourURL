@@ -4,7 +4,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>CutYourURL.me - Login</title>
+    <title>CutYourURL.tech - Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -62,12 +62,12 @@
         const signupLink = document.getElementById('signup-link');
         loginForm.style.display = 'block';
         signupForm.style.display = 'none';
-    
+
         loginLink.addEventListener('click', function () {
             loginForm.style.display = 'block';
             signupForm.style.display = 'none';
         });
-    
+
         signupLink.addEventListener('click', function () {
             loginForm.style.display = 'none';
             signupForm.style.display = 'block';
@@ -82,7 +82,7 @@
         signup_pass.style.display = 'none';
         login_invalid.style.display = 'none';
         signup_user.style.display = 'none';
-        
+
         let error = {{data}};
         if(error == 0){
             loginForm.style.display = 'block';
@@ -108,7 +108,7 @@
             }
         }
     });
-    
+
 </script>
 </body>
 </html>

@@ -4,13 +4,13 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>CutYourURL.me - Free URL Shortener Service</title>
+    <title>CutYourURL.tech - Free URL Shortener Service</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='gen.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 </head>
 
-<body>  
+<body>
     <main>
         <section id="short" class="main error" style="display:none;">
             <h1>An error occurred creating the short URL</h1>
@@ -54,10 +54,10 @@
                       <img id="qr" alt="Auto-generated Short QR Code of your URL" class="alignRight" src="{{data.3}}">
                     </div>
                   </div>
-                  
+
             </div>
         </section>
-        
+
         <section id="content">
             <h2>Why did I recieved "Invalid URL" error?</h2>
             <p>
@@ -101,7 +101,7 @@
             document.addEventListener("DOMContentLoaded", function () {
                 let data = {{ data | safe }};
                 console.log(data);
-        
+
                 if (data[0] == "err") {
                     document.getElementsByClassName("error")[0].style.display = "block";
                     document.getElementsByClassName("done")[0].remove();
@@ -112,11 +112,11 @@
                     document.querySelector("#short.main.error ul").innerHTML = `<li class="list">A server-side error has been noticed, sorry. Please come back later!</li>`;
                 } else{
                     var urlInput = document.getElementById("url");
-        
+
                     urlInput.addEventListener("click", function () {
                         this.select();
                     });
-        
+
                     function copyLink() {
                         var copyText = document.getElementById("url");
                         copyText.select();
@@ -124,12 +124,12 @@
                         navigator.clipboard.writeText(copyText.value);
                         document.querySelector("#copyBtn").value = "Copied!";
                     }
-        
+
                     document.getElementById("copyBtn").addEventListener("click", copyLink);
                 }
             });
         </script>
-        
+
 </body>
 
 </html>

@@ -1,24 +1,21 @@
-# 18 March 2024:
+# 19 March 2024:
 ## What is added
-Today were like 8+ commits done, these features were added:
-- QR Codes for each short link are now generated!
-- Shown links are now splited, so very-very-very long links won't overflow your screen. (They are trimmed/cropped now)
-- Some extra logging: attempting to redirect to short of ID, etc
-- Template for user (when they are logged in or are guest, shows always on / route)
-- Template for recent shorts (on / route)
+Nothing is added in this commit today, but some good things:
+- We got a custom domain now!
 
-## New files
-Extra files added too:
-- login-backup-empty.db: the backup of the login.db file initialized with the table without any data
-- shorts-backup-empty: the backup of login.db file initialized with the table without any data
+My Github Student Dev Pack got approved and now I have access to the lot perks. For you all guys, I bought the domain <a href="https://cutyoururl.tech" target="_blank">cutyoururl.tech</a> domain! Now the URLs should be really short!
 
-(And some more files related to templates)
+- Changed hosting provider: PythonAnywhere --> Railway.App
 
-## More:
-- Added some more comments in the code
-- Added some more info in the readme file
-- Info about new changes will now be added on every day's commits
-<details><summary>Bug fix: recent shorts is empty table when there is no data in the shorts db</summary>Now it will show you that there is no data.</details>
-<details><summary>Bug fix: able to login or signup even already logged in</summary>You cannot do that anymore now, you will be redirected to / route</details>
-<details><summary>Bug fix: logout always tries to logout even not logged in</summary>You will be logged out to / route if you were logged in, and always redirected to home.</details>
-<details><summary>Feature: signup should instantly login with the signed-up account</summary>Ok, this is now added.</summary>
+PythonAnywhere didn't had a custom domain option for free users, so I had to change the hosing provider. [Railway.app](https://railway.app) worked as a good hosting provider so now we'll be using it.
+
+> In edition to the new custom domain, you can use both of these links to work the same:
+> - [cutyoururl.tech](https://cutyoururl.tech/)
+> - [cutyoururl-production.up.railway.app](https://cutyoururl-production.up.railway.app/)
+>
+> The second link is from railway.app and it should be always on I guess, however the cutyoururl.tech one is only available for one year.
+
+## Modifications
+What has been edited:
+- Rename CutYourURL.me to CutYourURL.tech
+- A template for captcha.html (wait, i'll work on it very soon)
