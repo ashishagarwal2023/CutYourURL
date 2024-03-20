@@ -131,9 +131,26 @@
 				var copyText = document.getElementById("url");
 				copyText.select();
 				copyText.setSelectionRange(0, 99999);
-				navigator.clipboard.writeText(copyText.value);
-				document.querySelector("#copyBtn").value = "Copied!";
+
+				// Try using Clipboard API
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(copyText.value)
+						.then(function () {
+							document.querySelector("#copyBtn").value = "Copied!";
+						})
+						.catch(function (err) {
+							console.error('Error copying text: ', err);
+							// Fallback to execCommand
+							document.execCommand('copy');
+							document.querySelector("#copyBtn").value = "Copied!";
+						});
+				} else {
+					// Fallback to execCommand
+					document.execCommand('copy');
+					document.querySelector("#copyBtn").value = "Copied!";
+				}
 			}
+
 
 			document.getElementById("copyBtn").addEventListener("click", copyLink);
 		}
