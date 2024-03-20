@@ -36,7 +36,7 @@ SCHEMA_FILE = "./login.sql"
 captchaSiteKey = (
     "6LcuA54pAAAAAIqHROKzlEoTPA7G4KMxvluzDZpl"  # Google reCAPTCHA v2 site key
 )
-spoofDomain = "https://cutyoururl.tech"  # used to spoof domain
+spoofDomain = "https://cutyoururl.tech/"  # used to spoof domain
 
 app = Flask(__name__)
 login_manager.init_app(app)
