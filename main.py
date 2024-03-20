@@ -36,6 +36,7 @@ SCHEMA_FILE = "./login.sql"
 captchaSiteKey = (
     "6LcuA54pAAAAAIqHROKzlEoTPA7G4KMxvluzDZpl"  # Google reCAPTCHA v2 site key
 )
+spoofDomain = "https://cutyoururl.tech"  # used to spoof domain
 
 app = Flask(__name__)
 login_manager.init_app(app)
@@ -256,8 +257,7 @@ def short():
             url = request.form.get("url")
             captchaEnabled = "captcha" in request.form
 
-            domain = request.url_root
-            if valid.verify(url, domain):
+            if valid.verify(url):
                 pass  # The given URL is valid, we can continue to shorten it
             else:
                 # The given URL is not valid, we can not continue with such a URL.
@@ -280,7 +280,7 @@ def short():
                 app.logger.info(f"Generated new short URL: /{short_url}\n")
             else:  # Already existed
                 app.logger.info(f"Returning already-generated URL: /{short_url}\n")
-            full = f"{request.url_root}{short_url}"  # Generates a URL like http://127.0.0.1:5000/s/4n8MSl
+            full = f"{spoofDomain}{short_url}"  # Generates a URL like http://127.0.0.1:5000/s/4n8MSl
             views = views[0] if views else 0
             qrURI = qr(full)
             app.logger.info(f"Generated QR Code URI from: {full}\n")
