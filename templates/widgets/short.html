@@ -5,14 +5,39 @@
 			<div id="submitBtn">
 				<input type="submit" value="Cut!">
 			</div>
-			
 		</div>
 		<p>
 		<details>
 			<summary>Advanced Options:</summary>
 			<label for="captcha">Enable Captcha Security? </label>
 			<input type="checkbox" id="captcha" name="captcha">
+			<br>
+			<label for="customSlug">Custom Slug? </label>
+			<input type="checkbox" id="customSlug" name="customSlug" onchange="toggleCustomSlug()">
+			<input type="text" id="slugInput" name="slugInput" value="XXXXXX" readonly minlength="6" maxlength="6"
+				   required oninput="enforceSlugInputRestrictions()">
+			<p>All X in slugs are randomized server-side. Taken slugs will be rejected and a complete random will
+				generate.</p>
 		</details>
 		</p>
 	</form>
+	<script>
+		function toggleCustomSlug() {
+			var checkbox = document.getElementById('customSlug');
+			var input = document.getElementById('slugInput');
+			if (checkbox.checked) {
+				input.readOnly = false;
+			} else {
+				input.value = 'XXXXXX';
+				input.readOnly = true;
+			}
+		}
+
+		function enforceSlugInputRestrictions() {
+			var input = document.getElementById('slugInput');
+			input.value = input.value.toUpperCase();
+			input.value = input.value.replace(/ /g, '-');
+			input.value = input.value.replace(/[^A-Z0-9-_]/g, '');
+		}
+	</script>
 {% endblock %}

@@ -37,16 +37,16 @@ captchaSiteKey = (
     "6LcuA54pAAAAAIqHROKzlEoTPA7G4KMxvluzDZpl"  # Google reCAPTCHA v2 site key
 )
 
+app = Flask(__name__)
+login_manager.init_app(app)
+app.secret_key = "tBwMEtArOWakISWGAfJzDJL8IPzMu9j0"  # Change this if you want!
+
 # Load DB
 with sqlite3.connect(LOGIN_DB) as db:
     cursor = db.cursor()
     q = "SELECT * FROM users"
     cursor.execute(q, ())
     users = cursor.fetchall()
-
-app = Flask(__name__)
-login_manager.init_app(app)
-app.secret_key = "tBwMEtArOWakISWGAfJzDJL8IPzMu9j0"  # Change this if you want!
 
 
 def cutText(text, length):
@@ -132,7 +132,6 @@ def init_db():
 
 
 # Random ID Generator Method
-# Random ID Generator Method
 def gen_short(length=6):
     chars = string.ascii_letters + string.digits
     short_id = "".join(random.choice(chars) for _ in range(length))
@@ -160,6 +159,58 @@ def shortUrl(url, length, captcha):
         if not existing_short_url:
             break
         short_url = gen_short(length)
+
+    captcha_enabled = False
+    if int(captcha) == 1:
+        captcha_enabled = True
+
+    cursor.execute(
+        "INSERT INTO short_urls (short_url, original_url, captcha) VALUES (?, ?, ?)",
+        (short_url, url, captcha_enabled),
+    )
+    db.commit()
+    cursor.close()
+    return f"{dir_name}/{short_url}"
+
+
+# After a short URL id is made, this function holds the further tasks
+# Like to add the URL to database, check if it already exists.
+def shortUrl(url, length, captcha):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
+    existing_short_url = cursor.fetchone()
+
+    if existing_short_url:
+        cursor.close()
+        return f"{dir_name}/{existing_short_url[0]}"
+
+    # Retrieve the custom slug value from the form data
+    customSlug = request.form.get("slugInput")
+    # Replace all 'X' in the customSlug with a random character
+    for _ in range(customSlug.count("X")):
+        customSlug = customSlug.replace("X", gen_short(1), 1)
+
+    # Check if custom slug is provided and not already in use
+    if customSlug and not customSlug.isspace():
+        cursor.execute("SELECT * FROM short_urls WHERE short_url=?", (customSlug,))
+        existing_short_url = cursor.fetchone()
+        if not existing_short_url:
+            short_url = customSlug
+        else:
+            short_url = gen_short(length)
+    else:
+        short_url = gen_short(length)
+
+    # Only generate a new short_url if a custom slug was not provided or was already in use
+    short_url = customSlug
+    if not customSlug or existing_short_url:
+        while True:
+            cursor.execute("SELECT * FROM short_urls WHERE short_url=?", (short_url,))
+            existing_short_url = cursor.fetchone()
+            if not existing_short_url:
+                break
+            short_url = gen_short(length)
 
     captcha_enabled = False
     if int(captcha) == 1:
@@ -204,6 +255,7 @@ def short():
         try:
             url = request.form.get("url")
             captchaEnabled = "captcha" in request.form
+
             domain = request.url_root
             if valid.verify(url, domain):
                 pass  # The given URL is valid, we can continue to shorten it
