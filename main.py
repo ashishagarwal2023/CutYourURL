@@ -2,16 +2,14 @@
 import logging
 import os
 import random
-import sqlite3
 import string
-import sys
 from logging.handlers import TimedRotatingFileHandler
 
 import flask
 import flask_login as fl
 from flask import Flask, render_template, redirect, request, g
 
-import recent
+import sqlite3
 import valid
 from qr import qr
 
@@ -37,6 +35,43 @@ captchaSiteKey = (
     "6LcuA54pAAAAAIqHROKzlEoTPA7G4KMxvluzDZpl"  # Google reCAPTCHA v2 site key
 )
 spoofDomain = "https://cutyoururl.tech/"  # used to spoof domain
+
+def recents(length=6):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        f"SELECT short_url, original_url, views, inserted_at FROM short_urls ORDER BY datetime(inserted_at) DESC LIMIT {length}"
+    )
+    rows = cursor.fetchall()
+    cursor.close()
+    return rows
+
+
+def get_db():
+    db = getattr(g, "_database", None)
+    if db is None:
+        try:
+            db = g._database = sqlite3.connect(DATABASE)
+        except sqlite3.OperationalError:
+            print("Found no database, migtht be deleted. Restoring database!")
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        db.execute("PRAGMA foreign_keys = ON")
+    return db
+
+
+# Close DB function
+def close_db(exception=None):
+    db = getattr(g, "_database", None)
+    if db is not None:
+        db.close()
+
+
+# To make shorts db from schema
+def init_db():
+    db = get_db()
+    with app.open_resource("schema.sql", mode="r") as f:
+        db.cursor().executescript(f.read())
+    db.commit()
 
 app = Flask(__name__)
 login_manager.init_app(app)
@@ -103,33 +138,6 @@ log_handler.setFormatter(log_formatter)
 app.logger.addHandler(log_handler)
 app.logger.setLevel(logging.DEBUG)
 
-
-# Restore the shorts.db database if it was deleted
-def get_db():
-    db = getattr(g, "_database", None)
-    if db is None:
-        try:
-            db = g._database = sqlite3.connect(DATABASE)
-        except sqlite3.OperationalError:
-            print("Found no database, migtht be deleted. Restoring database!")
-            os.execl(sys.executable, sys.executable, *sys.argv)
-        db.execute("PRAGMA foreign_keys = ON")
-    return db
-
-
-# Close DB function
-def close_db(exception=None):
-    db = getattr(g, "_database", None)
-    if db is not None:
-        db.close()
-
-
-# To make shorts db from schema
-def init_db():
-    db = get_db()
-    with app.open_resource("schema.sql", mode="r") as f:
-        db.cursor().executescript(f.read())
-    db.commit()
 
 
 # Random ID Generator Method
@@ -243,7 +251,7 @@ def index():
         username = ""  # Guest username, is trimmed on client-side
 
     return render_template(
-        "index.html", username=username, recents=recent.recents(5), cutText=cutText
+        "index.html", username=username, recents=recents(5), cutText=cutText
     )  # Recent shorts are supplied and username is too
 
 
