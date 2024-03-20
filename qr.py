@@ -1,8 +1,10 @@
+import base64
+import io
+import os
+
 import qrcode
 from PIL import Image
-import os
-import io
-import base64
+
 
 def qr(text, qr_color="orange", back_color="white", logo_path="./static/qrlogo.png"):
     qr = qrcode.QRCode(

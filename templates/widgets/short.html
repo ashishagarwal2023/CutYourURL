@@ -23,8 +23,8 @@
 	</form>
 	<script>
 		function toggleCustomSlug() {
-			var checkbox = document.getElementById('customSlug');
-			var input = document.getElementById('slugInput');
+			let checkbox = document.getElementById('customSlug');
+			let input = document.getElementById('slugInput');
 			if (checkbox.checked) {
 				input.readOnly = false;
 			} else {
@@ -34,7 +34,7 @@
 		}
 
 		function enforceSlugInputRestrictions() {
-			var input = document.getElementById('slugInput');
+			let input = document.getElementById('slugInput');
 			input.value = input.value.toUpperCase();
 			input.value = input.value.replace(/ /g, '-');
 			input.value = input.value.replace(/[^A-Z0-9-_]/g, '');
