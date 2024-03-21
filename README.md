@@ -1,8 +1,8 @@
 <p align="center">
-  <a href="https://cutyoururl.tech/" rel="noopener">
+  <a href="https://cutyoururl.pythonanywhere.com" rel="noopener">
  <img width=200px height=200px src="static/CutYourURL.png" alt="CutYourURL Logo"></a>
 </p>
-<h3 align="center">CutYourURL.tech</h3>
+<h3 align="center">CutYourURL</h3>
 <p align="center"> 🤖 Shorten your links for free with a powerful interface!
     <br>
 </p>
@@ -10,7 +10,7 @@
 
 [![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dashish_agarwal%26type%3Dpledges&style=flat)](https://patreon.com/ashish_agarwal)
 
-[Try out here! ⤴](https://cutyoururl.tech/)
+[Try out here! ⤴](https://cutyoururl.pythonanywhere.com)
 
 </div>
 
@@ -27,6 +27,8 @@
 I just wanted to have a cool project, and I made this. I also need to shorten some URLs, and bit.ly's URL shortner is good but not free and it requires me to have a account.
 
 Just a project to include in my stack. Also, this domain is just a 1-year domain from GitHub Student Dev Pack, I'm not sure where would I move it after it expires.
+
+There are some issues with the domain so sadly I cannot have a custom domain for this site. ;-;
 
 > For information about every commits (not all, but new feature ones), there is a updates.md file.
 
@@ -54,9 +56,7 @@ python3 -m pip install -r requirements.txt
 ```bash
 python3 main.py
 
-# Gunicorn is also installed with the requirements (needed to host on server)
-# You can use gunicorn for local server too!
-# Gunicorn will be installed from requirements
+# Gunicorn can be used to run
 python3 -m gunicorn main:app
 ```
 
