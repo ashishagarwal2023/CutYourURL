@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>CutYourURL.tech - Verify Email</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div>
+	<div>
+		<form action="/login" method="POST" id="login-form" class="login-form" style="display: block;">
+			<h1>Verify your email</h1>
+			<p>To continue to <a href="/">CutYourURL</a></p>
+			<p>Your account will be created as you verify email.</p>
+			<div class="input-group">
+				<label for="login-email">Email:</label>
+				<input type="text" id="login-email" name="email" placeholder="Enter your email" required=""
+					   value="code.with.aasheesh@gmail.com" readonly="">
+			</div>
+			<div class="input-group">
+				<label for="login-password">Enter OTP:</label>
+				<input type="text" id="login-password" name="password" placeholder="Enter your password" required="">
+			</div>
+			<button type="submit">Verify</button>
+			<p>Don't have an account? <span id="signup-link">Sign Up</span></p>
+			<p class="error" id="login_invalid" style="display: none;">Invalid username or password.</p>
+		</form>
+	</div>
+</div>
+</body>
+</html>
