@@ -40,13 +40,13 @@ def email(to, subject, body):
 
 def otp(user, to):
 	otp = random.randint(100000, 999999)
-	subject = "Your OTP to login at CutYourURL"
+	subject = "Your OTP to verify your account at CutYourURL"
 
 	body = f"""Hi {user},
 	<br>
-	<br>Your OTP to login on CutYourURL is <b>{otp}</b>. Do not share it with anyone!
+	<br>Your OTP to verify your account on CutYourURL is <b>{otp}</b>. Do not share it with anyone!
 	<br>
-	<br>This OTP is only valid for <a href="https://cutyoururl.pythonanywhere.com/" target="_blank">CutYourURL</a> and is valid for 5 minutes.
+	<br>This OTP is only valid for <a href="https://cutyoururl.pythonanywhere.com/" target="_blank">CutYourURL</a>. If you did not request it, you can safely ignore the email.
 	<br>
 	<br>Thanks,
 	<br>The CutYourURL Team
@@ -56,6 +56,7 @@ def otp(user, to):
 	<br><i>Follow me on my <a href='https://github.com/ashishagarwal2023' target='_blank'>GitHub</a> and give a
 	star on the <a href='https://github.com/ashishagarwal2023/CutYourURL' target='_blank'>project</a>!</i>"""
 
-	return email(to, subject, body)
-
-# otp("Ashish", "code.with.aasheesh@gmail.com")
+	if email(to, subject, body):
+		return otp
+	else:
+		return False

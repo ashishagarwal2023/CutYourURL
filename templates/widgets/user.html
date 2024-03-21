@@ -6,9 +6,9 @@
 				here</a></p>
 		{% else %}
 			<h2>Welcome, {{ username }}!</h2>
-			<p>You are currently logged in as {{ username }}. You have been granted the cool perks to short your
-				URLs!</p>
-			<a class="logoutBtn" href="/logout">Logout?</a><br><br>
+			<p>Hello, {{ username }}! You are logged in. Visit your account settings by going <a href="/account">here</a>.</p>
+			<p><a class="logoutBtn" href="/logout">Logout?</a>
+			<a href="/account"><button class="comingbtn">Account Settings</button></a></p>
 		{% endif %}
 	</section>
 {% endblock %}

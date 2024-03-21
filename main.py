@@ -9,8 +9,9 @@ from logging.handlers import TimedRotatingFileHandler
 import flask
 import flask_login as fl
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, request, g
+from flask import Flask, render_template, redirect, request, g, jsonify
 
+import otp as o
 import valid
 from qr import qr
 
@@ -38,6 +39,7 @@ captchaSiteKey = os.getenv("captchaSiteKey")
 spoofDomain = os.getenv("spoofDomain")
 secretKey = os.getenv("secretKey")
 
+
 def recents(length=6):
     db = get_db()
     cursor = db.cursor()
@@ -47,6 +49,11 @@ def recents(length=6):
     rows = cursor.fetchall()
     cursor.close()
     return rows
+
+
+def get_login():
+    logindb = sqlite3.connect(LOGIN_DB)
+    return logindb
 
 
 def get_db():
@@ -74,6 +81,7 @@ def init_db():
     with app.open_resource("schema.sql", mode="r") as f:
         db.cursor().executescript(f.read())
     db.commit()
+
 
 app = Flask(__name__)
 login_manager.init_app(app)
@@ -139,7 +147,6 @@ log_handler = TimedRotatingFileHandler(
 log_handler.setFormatter(log_formatter)
 app.logger.addHandler(log_handler)
 app.logger.setLevel(logging.DEBUG)
-
 
 
 # Random ID Generator Method
@@ -247,13 +254,23 @@ def before_request():
 # Homepage
 @app.route("/", methods=["GET", "POST"])
 def index():
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    verified = True
     if fl.current_user.is_authenticated:
         username = fl.current_user.id
+        verified = cursorlogin.execute(
+            "SELECT verified FROM users WHERE username=?", (username,)
+        ).fetchone()[0]
     else:
         username = ""  # Guest username, is trimmed on client-side
 
     return render_template(
-        "index.html", username=username, recents=recents(5), cutText=cutText
+        "index.html",
+        username=username,
+        recents=recents(5),
+        cutText=cutText,
+        verified=verified,
     )  # Recent shorts are supplied and username is too
 
 
@@ -266,6 +283,13 @@ def short():
         try:
             url = request.form.get("url")
             captchaEnabled = "captcha" in request.form
+            logindb = get_login()
+            cursorlogin = logindb.cursor()
+            verified = True
+            if fl.current_user.is_authenticated:
+                verified = cursorlogin.execute(
+                    "SELECT verified FROM users WHERE username=?", (username,)
+                ).fetchone()[0]
 
             if valid.verify(url):
                 pass  # The given URL is valid, we can continue to shorten it
@@ -275,6 +299,7 @@ def short():
                     "generated.html",
                     data=["err", ""],
                     username=username,
+                    verified=verified,
                 )
             db = get_db()
             Vcursor = db.cursor()
@@ -304,6 +329,7 @@ def short():
                 username=username,
                 captchaEnabled=captchaEnabled,
                 cropped=croppedURL,
+                verified=verified
             )  # Success
         except Exception as e:
             app.logger.error(f"Server exception during shorting: {e}\n")
@@ -313,12 +339,11 @@ def short():
                 data=["exc"],
                 username=username,
                 cropped="",
+	            verified=verified
             )  # Server exception
     else:
         app.logger.error(f"GET request received without parameters for /short\n")
-        return render_template(
-            "generated.html", data=["err", ""], username=username, cutText=cutText
-        )  # GET without parameters, client error.
+        return redirect("/")  # GET without parameters, client error.
 
 
 @app.route(f"/{dir_name}/<short_url>")
@@ -413,10 +438,14 @@ def signup():
                 "login.html", error=2
             )  # Client Error : Username taken
 
+        otp = o.otp(username, email)
+        if not otp:
+            return render_template("login.html", error=3)
+
         # Insert the new user record
         cursor.execute(
-            "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-            (username, email, password),
+            "INSERT INTO users (username, email, password, OTP) VALUES (?, ?, ?, ?)",
+            (username, email, password, otp),
         )  # Signed up
         user = User(username)
         user.id = username
@@ -471,6 +500,110 @@ def captcha():
         return original_url
     else:
         return redirect("/")
+
+
+@app.route("/account")
+def account():
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    if fl.current_user.is_authenticated:
+        username = fl.current_user.id
+        verified = cursorlogin.execute(
+            "SELECT verified, email FROM users WHERE username=?", (username,)
+        ).fetchone()
+        email = verified[1]
+        verified = verified[0]
+        if verified == 1:
+            verified = True
+        else:
+            verified = False
+    else:
+        username = ""
+        return redirect("/login")
+    return render_template(
+        "account.html", email=email, username=username, verified=verified
+    )
+
+
+@app.route("/account/verifyOtp", methods=["POST"])
+def verify_otp():
+    data = request.get_json()
+    otp = data.get("otp")
+    username = data.get("username")
+    is_valid = verify_otp_for_user(username, otp)
+    return jsonify(is_valid)
+
+
+def verify_otp_for_user(username, otp):
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    cursorlogin.execute("SELECT OTP FROM users WHERE username=?", (username,))
+    result = int(cursorlogin.fetchone()[0])
+    otp = int(otp)
+
+    if otp == result:
+        cursorlogin.execute("UPDATE users SET verified=1 WHERE username=?", (username,))
+        logindb.commit()
+        cursorlogin.close()
+        return True
+    else:
+        return False
+
+
+@app.route("/account/changeEmail", methods=["POST"])
+def change_email():
+    data = request.get_json()
+    new_email = data.get("email")
+    username = data.get("username")
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    cursorlogin.execute(
+        "UPDATE users SET email=?, verified = 0 WHERE username=?", (new_email, username)
+    )
+    logindb.commit()
+    cursorlogin.close()
+    resend_otp()
+    return jsonify(True)
+
+
+@app.route("/account/resendOTP", methods=["POST"])
+def resend_otp():
+    data = request.get_json()
+    username = data.get("username")
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    cursorlogin.execute("SELECT email FROM users WHERE username=?", (username,))
+    email = cursorlogin.fetchone()[0]
+    otp = o.otp(username, email)
+    cursorlogin.execute("UPDATE users SET OTP=? WHERE username=?", (otp, username))
+    logindb.commit()
+    cursorlogin.close()
+    return jsonify(True)
+
+
+@app.route("/account/changePassword", methods=["POST"])
+def change_password():
+    data = request.get_json()
+    new_pass = data.get("new_pass")
+    current_pass = data.get("current_pass")
+    username = data.get("username")
+    confirm_pass = data.get("confirm_pass")
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    cursorlogin.execute("SELECT password FROM users WHERE username=?", (username,))
+    password = cursorlogin.fetchone()[0]
+    if password == current_pass:
+        if new_pass == confirm_pass and (not (current_pass == new_pass)):
+            cursorlogin.execute(
+                "UPDATE users SET password=? WHERE username=?", (new_pass, username)
+            )
+            logindb.commit()
+            cursorlogin.close()
+            return jsonify(True)
+        else:
+            return jsonify(False)
+    else:
+        return jsonify(False)
 
 
 if __name__ == "__main__":

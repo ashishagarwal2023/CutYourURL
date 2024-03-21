@@ -1,0 +1,61 @@
+{% block contents %}
+	{% if (not verified) and username %}
+		<style>
+			html {
+				margin: 0;
+				padding: 0;
+			}
+
+			.top-banner {
+				margin-bottom: 30px;
+				backdrop-filter: blur(4px) saturate(177%);
+				background-color: rgba(255, 249, 249, 0.76);
+				box-shadow: 0 1px 4px #ccc;
+				overflow: hidden;
+				text-align: center;
+				z-index: 99;
+			}
+
+			.top-banner a, .top-banner span {
+				display: inline-block;
+			}
+
+			.top-banner a {
+				width: 100%;
+				padding: 15px 0;
+				text-decoration: none;
+				color: #e17900;
+			}
+
+			.top-banner span {
+				line-height: 28px;
+				padding: 0 10px;
+				background-color: #0278d9;
+				border-radius: 20px;
+				color: white;
+			}
+
+			.sticky {
+				position: fixed;
+				width: 100%;
+			}
+		</style>
+		<div class="top-banner">
+			<a href="#" target="_blank">You are not currently verified. <span>Verify now</span></a>
+		</div>
+		<script>
+			let banner = document.querySelector('div.top-banner');
+			let top_banner = banner.offsetTop;
+
+			function stickybanner() {
+				if (window.scrollY >= top_banner) {
+					banner.classList.add('sticky');
+				} else {
+					banner.classList.remove('sticky');
+				}
+			}
+
+			window.addEventListener('scroll', stickybanner);
+		</script>
+	{% endif %}
+{% endblock %}

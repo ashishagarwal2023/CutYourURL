@@ -1,0 +1,33 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>CutYourURL.tech - Free URL Shortener Service</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='dash.css') }}">
+</head>
+<body>
+<input type="hidden" value="{{ username }}" name="username" id="username">
+<main>
+	<section id="content" class="main">
+		<h2>My Account</h2>
+		<p>Customize your account and make it feel more personal. Make sure to have verified email to prevent loss of
+			account!<br><br>It's currently
+			under development, and is <a href="https://github.com/ashishagarwal2023/CutYourURL/" target="_blank">open-source</a>
+			on GitHub. Programmed by <a href="https://github.com/ashishagarwal2023"
+										target="_blank">ashishagarwal2023</a> and some other fellow <a
+				href="https://github.com/ashishagarwal2023/CutYourURL/graphs/contributors"
+				target="_blank">contributors</a>.
+		</p>
+		<p>Are you ready? Click to go back to the home page!</p>
+		<p><a href="/"><button class="comingbtn btn btn-blue">Return to home</button></a></p>
+		{% include 'account/verify.html' %}
+		<br><br>
+		{% include 'account/change.html' %}
+	</section>
+</main>
+</body>
+</html>

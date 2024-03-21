@@ -301,7 +301,7 @@ input[name="submit"] {
 	}
 }
 
-section#short.main {
+.main {
 	margin-top: 30px;
 }
 
