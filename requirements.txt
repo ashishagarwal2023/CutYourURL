@@ -4,3 +4,4 @@ gunicorn
 pillow
 qrcode
 validators
+python-dotenv
