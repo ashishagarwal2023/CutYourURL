@@ -472,10 +472,6 @@ def captcha():
     else:
         return redirect("/")
 
-@app.route("/otp"):
-def otp():
-	return render_template("otp.html")
-
 
 if __name__ == "__main__":
     app.run(debug=True, port=os.getenv("PORT", default=5000))

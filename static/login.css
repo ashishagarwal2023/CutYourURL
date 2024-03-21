@@ -87,3 +87,6 @@ span {
 p.error {
 	color: rgb(150, 9, 9);
 }
+p.success{
+	color: rgb(0, 178, 35)
+}

@@ -11,24 +11,26 @@
 	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-<div>
-	<div>
-		<form action="/login" method="POST" id="login-form" class="login-form" style="display: block;">
+<div class="container">
+	<div class="forms-container">
+		<form id="otp-form" class="otp-form">
 			<h1>Verify your email</h1>
 			<p>To continue to <a href="/">CutYourURL</a></p>
-			<p>Your account will be created as you verify email.</p>
+			<p>Your account will be created as you verify email. <br>Please do not skip this step!</p>
 			<div class="input-group">
 				<label for="login-email">Email:</label>
-				<input type="text" id="login-email" name="email" placeholder="Enter your email" required=""
-					   value="code.with.aasheesh@gmail.com" readonly="">
+				<input type="text" id="login-email" name="email" placeholder="Enter your email" required  value="{{ email }}" readonly>
 			</div>
 			<div class="input-group">
-				<label for="login-password">Enter OTP:</label>
-				<input type="text" id="login-password" name="password" placeholder="Enter your password" required="">
+				<label for="login-otp">Enter OTP:</label>
+				<input type="text" id="login-otp" name="otp" placeholder="Enter your OTP" required>
 			</div>
 			<button type="submit">Verify</button>
-			<p>Don't have an account? <span id="signup-link">Sign Up</span></p>
-			<p class="error" id="login_invalid" style="display: none;">Invalid username or password.</p>
+			<p>Already have an account? <a href="https://cutyoururl.pythonanywhere.com/login" target="_blank"><span id="signup-link">Sign in</span></a></p>
+			<p class="error" id="otp_invalid" style="display: none;">Invalid OTP</p>
+			<p class="error" id="error" style="display: none;">Unknown error occured</p>
+			<p class="resend" id="resend">Resend OTP?</p>
+			<p class="success" id="done" style="display:none;">Successfully verified!</p>
 		</form>
 	</div>
 </div>
