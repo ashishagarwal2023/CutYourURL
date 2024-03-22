@@ -44,7 +44,7 @@ def otp(user, to):
 
 	body = f"""Hi {user},
 	<br>
-	<br>Your OTP to verify your account on CutYourURL is <b>{otp}</b>. Do not share it with anyone!
+	<br>Your OTP to verify your account at CutYourURL is <b>{otp}</b>. Do not share it with anyone!
 	<br>
 	<br>This OTP is only valid for <a href="https://cutyoururl.pythonanywhere.com/" target="_blank">CutYourURL</a>. If you did not request it, you can safely ignore the email.
 	<br>
