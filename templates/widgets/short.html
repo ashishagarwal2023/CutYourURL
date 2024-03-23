@@ -16,13 +16,15 @@
 			<input type="checkbox" id="customSlug" name="customSlug" onchange="toggleCustomSlug()">
 			<input type="text" id="slugInput" name="slugInput" value="XXXXXX" readonly minlength="6" maxlength="6"
 				   required oninput="enforceSlugInputRestrictions()">
+		<br>
+		<label for="public">Public? </label>
+		<input type="checkbox" id="public"  checked name="public">
 			<p>All X in slugs are randomized server-side. Taken slugs will be rejected and a complete random will
 				generate.</p>
 		</details>
 		</p>
 	</form>
-	<script>
-		function toggleCustomSlug() {
+	<script>		function toggleCustomSlug() {
 			let checkbox = document.getElementById('customSlug');
 			let input = document.getElementById('slugInput');
 			if (checkbox.checked) {

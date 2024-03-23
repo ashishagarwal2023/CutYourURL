@@ -44,7 +44,8 @@ def recents(length=6):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        f"SELECT short_url, original_url, views, inserted_at FROM short_urls ORDER BY datetime(inserted_at) DESC LIMIT {length}"
+        f"SELECT short_url, original_url, views, inserted_at FROM short_urls WHERE public = 1 ORDER BY datetime("
+        f"inserted_at) DESC LIMIT {length}"
     )
     rows = cursor.fetchall()
     cursor.close()
@@ -157,44 +158,13 @@ def gen_short(length=6):
         short_id = "".join(random.choice(chars) for _ in range(length))
     return short_id
 
-
 # After a short URL id is made, this function holds the further tasks
 # Like to add the URL to database, check if it already exists.
-def shortUrl(url, length, captcha):
+def shortUrl(url, length, captcha, visb):
     db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
-    existing_short_url = cursor.fetchone()
-
-    if existing_short_url:
-        cursor.close()
-        return f"{dir_name}/{existing_short_url[0]}"
-
-    short_url = gen_short(length)
-    while True:
-        cursor.execute("SELECT * FROM short_urls WHERE short_url=?", (short_url,))
-        existing_short_url = cursor.fetchone()
-        if not existing_short_url:
-            break
-        short_url = gen_short(length)
-
-    captcha_enabled = False
-    if int(captcha) == 1:
-        captcha_enabled = True
-
-    cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url, captcha) VALUES (?, ?, ?)",
-        (short_url, url, captcha_enabled),
-    )
-    db.commit()
-    cursor.close()
-    return f"{dir_name}/{short_url}"
-
-
-# After a short URL id is made, this function holds the further tasks
-# Like to add the URL to database, check if it already exists.
-def shortUrl(url, length, captcha):
-    db = get_db()
+    print(visb)
+    visb = 1 if visb == "on" else 0
+    print(visb)
     cursor = db.cursor()
     cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
     existing_short_url = cursor.fetchone()
@@ -235,8 +205,8 @@ def shortUrl(url, length, captcha):
         captcha_enabled = True
 
     cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url, captcha) VALUES (?, ?, ?)",
-        (short_url, url, captcha_enabled),
+        "INSERT INTO short_urls (short_url, original_url, captcha, public) VALUES (?, ?, ?, ?)",
+        (short_url, url, captcha_enabled, visb),
     )
     db.commit()
     cursor.close()
@@ -282,6 +252,7 @@ def short():
     if request.method == "POST":
         try:
             url = request.form.get("url")
+            isPublic = request.form.get("public")
             captchaEnabled = "captcha" in request.form
             logindb = get_login()
             cursorlogin = logindb.cursor()
@@ -310,7 +281,7 @@ def short():
 
             app.logger.info(f"POST request received for URL: {url}")
 
-            short_url = shortUrl(url, 6, captcha=captchaEnabled)
+            short_url = shortUrl(url, 6, captcha=captchaEnabled, visb=isPublic)
             if views == None:  # None means its just generated
                 app.logger.info(f"Generated new short URL: /{short_url}\n")
             else:  # Already existed

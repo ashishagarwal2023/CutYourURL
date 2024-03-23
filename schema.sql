@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS short_urls
 	views        INTEGER   DEFAULT 0,
 	length       INTEGER GENERATED ALWAYS AS (LENGTH(short_url)) STORED,
 	inserted_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	captcha      INTEGER   DEFAULT 0
+	captcha      INTEGER   DEFAULT 0,
+	public BOOLEAN DEFAULT TRUE
 );
