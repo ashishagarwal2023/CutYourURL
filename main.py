@@ -158,6 +158,7 @@ def gen_short(length=6):
         short_id = "".join(random.choice(chars) for _ in range(length))
     return short_id
 
+
 # After a short URL id is made, this function holds the further tasks
 # Like to add the URL to database, check if it already exists.
 def shortUrl(url, length, captcha, visb):
@@ -300,7 +301,7 @@ def short():
                 username=username,
                 captchaEnabled=captchaEnabled,
                 cropped=croppedURL,
-                verified=verified
+                verified=verified,
             )  # Success
         except Exception as e:
             app.logger.error(f"Server exception during shorting: {e}\n")
@@ -310,7 +311,7 @@ def short():
                 data=["exc"],
                 username=username,
                 cropped="",
-	            verified=verified
+                verified=verified,
             )  # Server exception
     else:
         app.logger.error(f"GET request received without parameters for /short\n")

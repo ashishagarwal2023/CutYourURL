@@ -349,40 +349,43 @@ section.recents p {
 	.left-column, .right-column {
 		width: 100%;
 		float: none;
-		text-align:left;
+		text-align: left;
 	}
 }
+
 details > summary::after {
-  content: " (expand)";
+	content: " (expand)";
 }
-details summary{
+
+details summary {
 	user-select: none;
 	cursor: pointer;
 }
 
 details[open] > summary::after {
-  content: " (collapse)";
+	content: " (collapse)";
 }
+
 details {
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  padding: .5em .5em 0;
-  margin-bottom: 1em;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	padding: .5em .5em 0;
+	margin-bottom: 1em;
 }
 
 summary {
-    margin: -.5em -.5em 0;
-  padding: .5em;
+	margin: -.5em -.5em 0;
+	padding: .5em;
 }
 
 summary::-webkit-details-marker {
-  display: none;
+	display: none;
 }
 
 details[open] {
-  padding: .5em;
+	padding: .5em;
 }
 
 details[open] summary {
-  margin-bottom: .5em;
+	margin-bottom: .5em;
 }
