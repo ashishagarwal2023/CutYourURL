@@ -24,13 +24,9 @@
 
 ## 🧐 About <a name = "about"></a>
 
-I just wanted to have a cool project, and I made this. I also need to shorten some URLs, and bit.ly's URL shortner is good but not free and it requires me to have a account.
+I built this project to make a free URL shortener with a powerful interface. It is based on Python-Flask and SQLite3. It is a free and open-source project, and you can use it for free. It is hosted on PythonAnywhere, and you can try it out [here](https://cutyoururl.pythonanywhere.com).
 
-Just a project to include in my stack. Also, this domain is just a 1-year domain from GitHub Student Dev Pack, I'm not sure where would I move it after it expires.
-
-There are some issues with the domain so sadly I cannot have a custom domain for this site. ;-;
-
-> For information about every commits (not all, but new feature ones), there is a updates.md file.
+It's not simple as writting a script. For this, I used some other libraries like to generate QR codes, flask-login for authentication and SQL. And it is also integrated with Gmail API, so it can verify emails.
 
 > Consider helping me and not making a spambot for my site, I cannot invest a bit on it. Try to support me, if you can!
 
@@ -45,23 +41,67 @@ Based on Python-Flask. It saves your shortened URLs to a database and keeps logg
 ## Running locally
 ### Prerequisites
 
-Make venv yourself, then install the packages.
+Start a new virtual environment and install all requirements
 
 ```bash
-python3 -m pip install -r requirements.txt
+$ python3 -m pip install -r requirements.txt
+# can take some while, for some reason the size gets
+# about 150mb, maybe.
+```
+### Making .env
+Then, you need to make a `.env` file in the project's root directory with the following content:
+```env
+LOGIN_DB=./cache/login.db
+dir_name=s
+DATABASE=./cache/shorts.db
+log_file_path=./cache/logs/shorts.log
+SCHEMA_FILE=./login.sql
+captchaSiteKey=6LcuA54pAAAAAIqHROKzlEoTPA7G4KMxvluzDZpl
+spoofDomain=http://127.0.0.1:5000/
+secretKey=tBwMEtArOWakISWGAfJzDJL8IPzMu9j0
+```
+> - Login DB: path to login db file
+> - Dir Name: route for generated shorts like /short/shortIDHERE, where short is the dir
+> - Database: path to shorts db file
+> - Log File Path: path to log file
+> - Schema File: path to schema file for login db
+> - Captcha Site Key: Google Captcha Site Key (v2 Site Key)
+> - Spoof Domain: The domain to spoof, like to show the paths at this domain (for example, https://cutyoururl.tech/ would be the spoof domain for the path https://cutyoururl.tech/short/shortIDHERE)
+> - The secret key is needed for flask login, you can just specify something there.
+
+You can get the captcha site key from [here](https://www.google.com/recaptcha/admin/create)
+
+### Adding Gmail Services
+You need to add a `credentials.json` file in the project's root directory. You can get it from [here](https://developers.google.com/gmail/api/quickstart/python). You can also use the `token.pickle` file to store the token, but it is not necessary.
+
+> Do not leak your `token.pickle` file, it can allow someone to take over your account.
+
+### Logging in
+After you got your credentials, you can run the following command which will attempt to send a simple email. Gmail API will automatically ask you to login.
+
+```bash
+$ python3 test.py
+# response would be llike
+Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth
+# authorize it
+
+# now a token.pickle file will be created
 ```
 
-### Running
-
+### Running on a server
+To run on a cloud server, here is what you can do:
 ```bash
-python3 main.py
+$ git clone https://github.com/ashishagarwal2023/CutYourURL.git
+$ cd CutYourURL
 
-# Gunicorn can be used to run
-python3 -m gunicorn main:app
+$ nano credentials.json # add your credentials
+$ wget -O token.pickle <url> # because token is binary format, use wget and save it
+
+$ python3 test.py # test to see if it gives a invalid to header error
+# because i do not want you to spam my mailbox during test bruh
 ```
 
 ## Common Errors
-It should not do any errors, and to prevent errors by the versions of new packages, I've specificed my version of all packages I'm using that is stable. However, theres still some errors:
 ### Cannot Access DB
 This error will occur if Python cannot open the DB under `./cache/login.db`. If you deleted the cache folder, it is not a issue, you can re-make it.
 > It will try to make ./cache/shorts.db automatically, but after running it and having login.db you don't have shorts.db, you might manually create one.
@@ -82,7 +122,6 @@ $ mv ./shorts.db ./cache/
 
 # Similiar tasks to make login.db and so for shorts.db
 ```
-> As of the last yesterday's update, I tried to automatically make the both databases whenever they are needed, but not guranteed. Few users might face a site down when the database is generating (very rare)
 
 Make sure you have installed all dependencies too!
 
