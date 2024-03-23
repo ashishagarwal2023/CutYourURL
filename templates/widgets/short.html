@@ -9,22 +9,41 @@
 		<p>
 		<details>
 			<summary>Advanced Options:</summary>
-			<label for="captcha">Enable Captcha Security? </label>
-			<input type="checkbox" id="captcha" name="captcha">
-			<br>
-			<label for="customSlug">Custom Slug? </label>
-			<input type="checkbox" id="customSlug" name="customSlug" onchange="toggleCustomSlug()">
-			<input type="text" id="slugInput" name="slugInput" value="XXXXXX" readonly minlength="6" maxlength="6"
-				   required oninput="enforceSlugInputRestrictions()">
-		<br>
-		<label for="public">Public? </label>
-		<input type="checkbox" id="public"  checked name="public">
-			<p>All X in slugs are randomized server-side. Taken slugs will be rejected and a complete random will
-				generate.</p>
+			<div class="left-column">
+				<label for="captcha">Enable Captcha Security? </label>
+				<input type="checkbox" id="captcha" name="captcha">
+				<br>
+				<label for="customSlug">Custom Slug? </label>
+				<input type="checkbox" id="customSlug" name="customSlug" onchange="toggleCustomSlug()">
+				<input type="text" id="slugInput" name="slugInput" value="XXXXXX" readonly minlength="6" maxlength="6"
+					   required oninput="enforceSlugInputRestrictions()">
+			</div>
+			<div class="right-column">
+				<label for="public">Public? </label>
+				<input type="checkbox" id="public" checked name="public">
+				<br>
+				<label for="expiryClicks">Expire after (clicks): </label>
+				<select name="expiryClicks" id="expiryClicks">
+				</select>
+			</div><br>
 		</details>
 		</p>
 	</form>
-	<script>		function toggleCustomSlug() {
+	<script>
+		let expiryClicksSelectBox = document.getElementById("expiryClicks");
+		expires = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2000, 5000];
+		for (let i = 0; i <= 10; i++) {
+			let option = document.createElement("option");
+			option.text = expires[i];
+			option.value = expires[i];
+			expiryClicksSelectBox.add(option);
+		}
+		let option = document.createElement("option");
+		option.text = "Never";
+		option.value = "0";
+		expiryClicksSelectBox.add(option);
+
+		function toggleCustomSlug() {
 			let checkbox = document.getElementById('customSlug');
 			let input = document.getElementById('slugInput');
 			if (checkbox.checked) {

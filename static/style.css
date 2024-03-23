@@ -331,3 +331,58 @@ section.recents p {
 	text-align: center;
 	padding-bottom: 15px;
 }
+
+.left-column, .right-column {
+	width: 50%;
+}
+
+.left-column {
+	float: left;
+}
+
+.right-column {
+	float: right;
+	text-align: right;
+}
+
+@media screen and (max-width: 600px) {
+	.left-column, .right-column {
+		width: 100%;
+		float: none;
+		text-align:left;
+	}
+}
+details > summary::after {
+  content: " (expand)";
+}
+details summary{
+	user-select: none;
+	cursor: pointer;
+}
+
+details[open] > summary::after {
+  content: " (collapse)";
+}
+details {
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  padding: .5em .5em 0;
+  margin-bottom: 1em;
+}
+
+summary {
+    margin: -.5em -.5em 0;
+  padding: .5em;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] {
+  padding: .5em;
+}
+
+details[open] summary {
+  margin-bottom: .5em;
+}

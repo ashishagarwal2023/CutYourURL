@@ -7,7 +7,7 @@ I do not think to be adding everything listed here but as far I can.
 | Feature          | Bitly URL Shortener | CutYourURL | Implemented |
 |------------------|---------------------|------------|---------|
 | **Cost**         | **Paid**            | **FREE**   | ☑️      |
-| Private Links    | Yes                 | ...        | ️       |
+| Private Links    | Yes                 | Yes        | ☑️️       |
 | Public Links     | No                  | Yes        |☑️ ️       |
 | Recent Links     | No                  | Yes        | ☑️️     |
 | Views Count      | Yes                 | Yes        | ☑️      |
