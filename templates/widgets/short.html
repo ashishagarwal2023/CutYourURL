@@ -22,7 +22,7 @@
 				<label for="public">Public? </label>
 				<input type="checkbox" id="public" checked name="public">
 				<br>
-				<label for="expiryClicks">Expire after (clicks): </label>
+				<label for="expiryClicks">Auto-delete after (clicks): </label>
 				<select name="expiryClicks" id="expiryClicks">
 				</select>
 			</div>
@@ -42,6 +42,7 @@
 		let option = document.createElement("option");
 		option.text = "Never";
 		option.value = "0";
+		option.selected = true;
 		expiryClicksSelectBox.add(option);
 
 		function toggleCustomSlug() {
