@@ -324,13 +324,13 @@ def redr_url(short_url):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT original_url, views, captcha FROM short_urls WHERE short_url=?",
+        "SELECT original_url, captcha FROM short_urls WHERE short_url=?",
         (short_url,),
     )
     url_info = cursor.fetchone()
 
     if url_info:
-        original_url, views, captcha = url_info
+        original_url, captcha = url_info
         if captcha:
             app.logger.info(f"Redirecting to captcha page for short URL: {short_url}")
             return render_template(
