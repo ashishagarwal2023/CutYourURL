@@ -67,7 +67,7 @@ secretKey=tBwMEtArOWakISWGAfJzDJL8IPzMu9j0
 > - Schema File: path to schema file for login db
 > - Captcha Site Key: Google Captcha Site Key (v2 Site Key)
 > - Spoof Domain: The domain to spoof, like to show the paths at this domain (for example, https://cutyoururl.tech/ would be the spoof domain for the path https://cutyoururl.tech/short/shortIDHERE)
-> - The secret key is needed for flask login, you can just specify something there.
+> - The secret key: a secret key for the flask app, something not memorable and unique
 
 You can get the captcha site key from [here](https://www.google.com/recaptcha/admin/create)
 
@@ -81,11 +81,14 @@ After you got your credentials, you can run the following command which will att
 
 ```bash
 $ python3 test.py
-# response would be llike
 Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth
-# authorize it
 
-# now a token.pickle file will be created
+# Authorize it
+# A token.pickle file woulld be made
+
+# You should get a error "Invalid To Header"
+# This is because I do not want you to spam my mailbox
+# but you are now verified/authenticated
 ```
 
 ### Running on a server

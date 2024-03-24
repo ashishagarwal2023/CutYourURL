@@ -86,7 +86,7 @@ def init_db():
 
 app = Flask(__name__)
 login_manager.init_app(app)
-app.secret_key = secretKey  # Change this if you want!
+app.secret_key = secretKey
 
 # Load DB
 with sqlite3.connect(LOGIN_DB) as db:
