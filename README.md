@@ -104,23 +104,16 @@ $ python3 test.py # test to see if it gives a invalid to header error
 ## Common Errors
 ### Cannot Access DB
 This error will occur if Python cannot open the DB under `./cache/login.db`. If you deleted the cache folder, it is not a issue, you can re-make it.
-> It will try to make ./cache/shorts.db automatically, but after running it and having login.db you don't have shorts.db, you might manually create one.
+> In the few next updates I'll be trying to automatically make the shorts and login db from schema, however errors comes everywhere.
 
 To re-make the login.db, you have to do:
 ```bash
-# sudo apt install sqlite3
-$ sqlite3 login.db < login.sql # install if not installed from apt
+$ sqlite3 login.db < login.sql # the login.db would be made
+$ sqlite3 shorts.db < schema.sql # the shorts.db would be made
 
-# then move login.db to cache
+# move both to cache folder
 $ mv ./login.db ./cache/
-
-# a login
-
-# if u need to restore the shorts.db, similiarly:
-$ sqlite3 shorts.db < schema.sql
 $ mv ./shorts.db ./cache/
-
-# Similiar tasks to make login.db and so for shorts.db
 ```
 
 Make sure you have installed all dependencies too!
