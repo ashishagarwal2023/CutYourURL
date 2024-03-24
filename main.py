@@ -235,7 +235,7 @@ def index():
         if result is not None:
             verified = result[0]
         else:
-            verified = False
+            verified = True
     else:
         username = ""  # Guest username, is trimmed on client-side
 
