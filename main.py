@@ -169,7 +169,7 @@ def shortUrl(url, length, captcha, visb):
     cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
     existing_short_url = cursor.fetchone()
 
-    if existing_short_url:
+    if existing_short_url and existing_short_url is not None:
         cursor.close()
         return f"{dir_name}/{existing_short_url[0]}"
 
