@@ -229,9 +229,13 @@ def index():
     verified = True
     if fl.current_user.is_authenticated:
         username = fl.current_user.id
-        verified = cursorlogin.execute(
+        result = cursorlogin.execute(
             "SELECT verified FROM users WHERE username=?", (username,)
-        ).fetchone()[0]
+        ).fetchone()
+        if result is not None:
+            verified = result[0]
+        else:
+            verified = False
     else:
         username = ""  # Guest username, is trimmed on client-side
 
