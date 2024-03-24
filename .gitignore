@@ -5,3 +5,4 @@ cache/
 ./token.pickle
 credentials.json
 token.pickle
+./.idea/

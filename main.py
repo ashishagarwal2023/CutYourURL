@@ -26,7 +26,7 @@ black_shorts = [
     "website",
     "site",
     "about",
-	"elepha",
+    "elepha",
     "details",
     "contact",
 ]
@@ -163,9 +163,8 @@ def gen_short(length=6):
 # Like to add the URL to database, check if it already exists.
 def shortUrl(url, length, captcha, visb):
     db = get_db()
-    print(visb)
+    expiryClicks = request.form.get("expiryClicks")
     visb = 1 if visb == "on" else 0
-    print(visb)
     cursor = db.cursor()
     cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
     existing_short_url = cursor.fetchone()
@@ -206,8 +205,8 @@ def shortUrl(url, length, captcha, visb):
         captcha_enabled = True
 
     cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url, captcha, public) VALUES (?, ?, ?, ?)",
-        (short_url, url, captcha_enabled, visb),
+        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks) VALUES (?, ?, ?, ?, ?)",
+        (short_url, url, captcha_enabled, visb, expiryClicks),
     )
     db.commit()
     cursor.close()
@@ -324,13 +323,13 @@ def redr_url(short_url):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT original_url, captcha FROM short_urls WHERE short_url=?",
+        "SELECT original_url, captcha, views, expiryClicks FROM short_urls WHERE short_url=?",
         (short_url,),
     )
     url_info = cursor.fetchone()
 
     if url_info:
-        original_url, captcha = url_info
+        original_url, captcha, views, expiryClicks = url_info
         if captcha:
             app.logger.info(f"Redirecting to captcha page for short URL: {short_url}")
             return render_template(
@@ -339,12 +338,20 @@ def redr_url(short_url):
                 captchaKey=captchaSiteKey,
                 short_id=short_url,
             )
-        cursor.execute(
-            "UPDATE short_urls SET views=views + 1 WHERE short_url=?",
-            (
-                short_url,
-            ),
-        )
+        views += 1
+        if views >= expiryClicks and expiryClicks != 0:  # Check if the expiry clicks limit has been reached
+            cursor.execute(
+                "DELETE FROM short_urls WHERE short_url=?",
+                (short_url,),
+            )
+        else:
+            cursor.execute(
+                "UPDATE short_urls SET views=? WHERE short_url=?",
+                (
+                    views,
+                    short_url,
+                ),
+            )
         db.commit()
         cursor.close()
         app.logger.info(f"Redirecting to original URL: {original_url}")
