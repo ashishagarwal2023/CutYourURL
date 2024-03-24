@@ -169,7 +169,7 @@ def shortUrl(url, length, captcha, visb):
     cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
     existing_short_url = cursor.fetchone()
 
-    if existing_short_url and existing_short_url is not None:
+    if existing_short_url:
         cursor.close()
         return f"{dir_name}/{existing_short_url[0]}"
 
@@ -232,7 +232,7 @@ def index():
         result = cursorlogin.execute(
             "SELECT verified FROM users WHERE username=?", (username,)
         ).fetchone()
-        if result is not None:
+        if result:
             verified = result[0]
         else:
             verified = True
