@@ -56,9 +56,9 @@ dir_name=s
 DATABASE=./cache/shorts.db
 log_file_path=./cache/logs/shorts.log
 SCHEMA_FILE=./login.sql
-captchaSiteKey=6LcuA54pAAAAAIqHROKzlEoTPA7G4KMxvluzDZpl
+captchaSiteKey=dont try me
 spoofDomain=http://127.0.0.1:5000/
-secretKey=tBwMEtArOWakISWGAfJzDJL8IPzMu9j0
+secretKey=somethingbruh
 ```
 > - Login DB: path to login db file
 > - Dir Name: route for generated shorts like /short/shortIDHERE, where short is the dir
