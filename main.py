@@ -213,7 +213,7 @@ def verify_otp_for_user(username, otp):
 # Like to add the URL to database, check if it already exists.
 def shortUrl(url, length, captcha, visb, expiryDate):
     db = get_db()
-    expiryClicks = request.form.get("expiryClicks")
+    expiryClicks = int(request.form.get("expiryClicks"))
     if not float(expiryDate) == 0:
         expiryDate = getTime(float(expiryDate))
     else:
@@ -311,7 +311,7 @@ def short():
     if request.method == "POST":
         try:
             url = request.form.get("url")
-            expiryDate = request.form.get("expiryDate")
+            expiryDate = float(request.form.get("expiryDate"))
             isPublic = request.form.get("public")
             captchaEnabled = "captcha" in request.form
             logindb = get_login()
