@@ -84,7 +84,7 @@ $ python3 test.py
 Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth
 
 # Authorize it
-# A token.pickle file woulld be made
+# A token.pickle file would be made
 
 # You should get a error "Invalid To Header"
 # This is because I do not want you to spam my mailbox
