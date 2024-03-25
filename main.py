@@ -3,15 +3,27 @@ import os
 import random
 import sqlite3
 import string
+import threading
+import time
+from datetime import datetime, timedelta
 from logging.handlers import TimedRotatingFileHandler
 
 import flask
 import flask_login as fl
+import schedule
 from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, request, g, jsonify
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    request,
+    g,
+    jsonify,
+)
 
 import otp as o
 import valid
+from delete_expired import delete_expired_urls
 from qr import qr
 
 load_dotenv()
@@ -40,6 +52,23 @@ spoofDomain = os.getenv("spoofDomain")
 secretKey = os.getenv("secretKey")
 
 
+def job():
+    delete_expired_urls()
+
+
+schedule.every(1).days.do(job)
+
+
+def run_schedule():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+scheduler_thread = threading.Thread(target=run_schedule, daemon=True)
+scheduler_thread.start()
+
+
 def recents(length=6):
     db = get_db()
     cursor = db.cursor()
@@ -50,6 +79,11 @@ def recents(length=6):
     rows = cursor.fetchall()
     cursor.close()
     return rows
+
+
+def getTime(add):
+    now = datetime.now()
+    return now + timedelta(days=add)
 
 
 def get_login():
@@ -159,11 +193,31 @@ def gen_short(length=6):
     return short_id
 
 
+def verify_otp_for_user(username, otp):
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    cursorlogin.execute("SELECT OTP FROM users WHERE username=?", (username,))
+    result = int(cursorlogin.fetchone()[0])
+    otp = int(otp)
+
+    if otp == result:
+        cursorlogin.execute("UPDATE users SET verified=1 WHERE username=?", (username,))
+        logindb.commit()
+        cursorlogin.close()
+        return True
+    else:
+        return False
+
+
 # After a short URL id is made, this function holds the further tasks
 # Like to add the URL to database, check if it already exists.
-def shortUrl(url, length, captcha, visb):
+def shortUrl(url, length, captcha, visb, expiryDate):
     db = get_db()
     expiryClicks = request.form.get("expiryClicks")
+    if not float(expiryDate) == 0:
+        expiryDate = getTime(float(expiryDate))
+    else:
+        expiryDate = 0
     visb = 1 if visb == "on" else 0
     cursor = db.cursor()
     cursor.execute("SELECT short_url FROM short_urls WHERE original_url=?", (url,))
@@ -205,8 +259,9 @@ def shortUrl(url, length, captcha, visb):
         captcha_enabled = True
 
     cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks) VALUES (?, ?, ?, ?, ?)",
-        (short_url, url, captcha_enabled, visb, expiryClicks),
+        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks, expiryDate) VALUES (?, ?, ?, "
+        "?, ?, ?)",
+        (short_url, url, captcha_enabled, visb, expiryClicks, expiryDate),
     )
     db.commit()
     cursor.close()
@@ -256,6 +311,7 @@ def short():
     if request.method == "POST":
         try:
             url = request.form.get("url")
+            expiryDate = request.form.get("expiryDate")
             isPublic = request.form.get("public")
             captchaEnabled = "captcha" in request.form
             logindb = get_login()
@@ -285,7 +341,9 @@ def short():
 
             app.logger.info(f"POST request received for URL: {url}")
 
-            short_url = shortUrl(url, 6, captcha=captchaEnabled, visb=isPublic)
+            short_url = shortUrl(
+                url, 6, captcha=captchaEnabled, visb=isPublic, expiryDate=expiryDate
+            )
             if views == None:  # None means its just generated
                 app.logger.info(f"Generated new short URL: /{short_url}\n")
             else:  # Already existed
@@ -343,7 +401,9 @@ def redr_url(short_url):
                 short_id=short_url,
             )
         views += 1
-        if views >= expiryClicks and expiryClicks != 0:  # Check if the expiry clicks limit has been reached
+        if (
+            views >= expiryClicks and expiryClicks != 0
+        ):  # Check if the expiry clicks limit has been reached
             cursor.execute(
                 "DELETE FROM short_urls WHERE short_url=?",
                 (short_url,),
@@ -513,22 +573,6 @@ def verify_otp():
     username = data.get("username")
     is_valid = verify_otp_for_user(username, otp)
     return jsonify(is_valid)
-
-
-def verify_otp_for_user(username, otp):
-    logindb = get_login()
-    cursorlogin = logindb.cursor()
-    cursorlogin.execute("SELECT OTP FROM users WHERE username=?", (username,))
-    result = int(cursorlogin.fetchone()[0])
-    otp = int(otp)
-
-    if otp == result:
-        cursorlogin.execute("UPDATE users SET verified=1 WHERE username=?", (username,))
-        logindb.commit()
-        cursorlogin.close()
-        return True
-    else:
-        return False
 
 
 @app.route("/account/changeEmail", methods=["POST"])

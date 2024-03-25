@@ -1,4 +1,5 @@
-CREATE TABLE users (
+DROP TABLE IF EXISTS users;
+CREATE TABLE IF NOT EXISTS users (
     username TEXT PRIMARY KEY,
     email TEXT,
     password TEXT,

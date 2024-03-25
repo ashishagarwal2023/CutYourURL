@@ -67,7 +67,7 @@ secretKey=somethingbruh
 > - Schema File: path to schema file for login db
 > - Captcha Site Key: Google Captcha Site Key (v2 Site Key)
 > - Spoof Domain: The domain to spoof, like to show the paths at this domain (for example, https://cutyoururl.tech/ would be the spoof domain for the path https://cutyoururl.tech/short/shortIDHERE)
-> - The secret key: a secret key for the flask app, something not memorable and unique
+> - The secret key: used for server and browser to talk. If it is leaked, consider changing it to prevent peoples from abusing it. A certificate that says a user valid.
 
 You can get the captcha site key from [here](https://www.google.com/recaptcha/admin/create)
 
