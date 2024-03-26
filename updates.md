@@ -1,22 +1,9 @@
-# 21 March 2024:
+# 26 March 2024:
 
 ## News
 
-- Yesterday: added expiryClicks - to delete shorts automatically when they reach a certain amount of clicks
-- Today: expiryDate - to delete shorts automatically in a specificed time
+- Fixed a bug where the DB is instantly cleared when initialized
 
-Because of limited bandwith and CPU time, on PythonAnywhere there I'm choosing to only have 1 expiryDate run per day -
-this means you can choose from minimum of 1 day of expiry to maximum how much you want.
+This bug made URLs automatically delete, or just not save, I've fixed it.
 
-> PythonAnywhere has limited bandwidths and so our project is limited too... :(
-
-## Modifications
-
-I forgot to tell yesterday..
-
-<details>
-<summary>Add expiryDate</summary>
-Now you can automatically delete shorts in some days to prevent permanent leak!
-</details>
-<details>
-<summary>(yesterday's) Add expiryClicks</summary>Automatically delete shorts on a certian amount, or limited clicks.</details>
+> We've added several features comparing to Bitly's, soon we'll be going to add a dashboard and etc so that we complete it!

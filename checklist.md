@@ -11,14 +11,14 @@ I do not think to be adding everything listed here but as far I can.
 | Public Links     | No                  | Yes        |☑️ ️       |
 | Recent Links     | No                  | Yes        | ☑️️     |
 | Views Count      | Yes                 | Yes        | ☑️      |
-| Date Expiry      | Yes                 | ...        |         |
+| Date Expiry      | Yes                 | ...        |   ☑️      |
 | Password Protect | Yes                 | ...        |         |
 | Dashboard        | Yes                 | ...        | ️       |
 | Analytics        | Yes                 | ...        | ️       |
 | Accounts         | Yes                 | Yes        | ☑️ ️    |
 | Short Links      | Yes                 | Yes        | ☑️      |
 | Custom Slugs     | Yes                 | Yes        | ☑️      |
-| Limited Clicks   | Yes                 | ...        | ️       |
+| Limited Clicks   | Yes                 | ...        | ☑️️       |
 | Bulk Shortening  | Yes                 | ...        | ️       |
 | QR Codes         | Yes                 | Yes        | ☑️      |
 | QR Custom Logo   | Yes                 | ...        | ️       |
