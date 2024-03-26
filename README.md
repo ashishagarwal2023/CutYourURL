@@ -36,7 +36,7 @@ Demo will be available soon.
 
 ## 💭 How it works <a name = "working"></a>
 
-Based on Python-Flask. It saves your shortened URLs to a database and keeps logging infos too. This makes it much easier and faster to have a API!
+You enter a long URL and we'll save it and give you a short URL. You can get a free QR code for your URL too, views counting, and automatically delete the URL when it reaches a amount of clicks or a date (limited clicks or expiry date). You can also have custom slugs on your URLs!
 
 ## Running locally
 ### Prerequisites
@@ -45,8 +45,6 @@ Start a new virtual environment and install all requirements
 
 ```bash
 $ python3 -m pip install -r requirements.txt
-# can take some while, for some reason the size gets
-# about 150mb, maybe.
 ```
 ### Making .env
 Then, you need to make a `.env` file in the project's root directory with the following content:
@@ -84,24 +82,7 @@ $ python3 test.py
 Please visit this URL to authorize this application: https://accounts.google.com/o/oauth2/auth
 
 # Authorize it
-# A token.pickle file would be made
-
-# You should get a error "Invalid To Header"
-# This is because I do not want you to spam my mailbox
-# but you are now verified/authenticated
-```
-
-### Running on a server
-To run on a cloud server, here is what you can do:
-```bash
-$ git clone https://github.com/ashishagarwal2023/CutYourURL.git
-$ cd CutYourURL
-
-$ nano credentials.json # add your credentials
-$ wget -O token.pickle <url> # because token is binary format, use wget and save it
-
-$ python3 test.py # test to see if it gives a invalid to header error
-# because i do not want you to spam my mailbox during test bruh
+# If you get a error Invalid TO Header, then you are done
 ```
 
 ## Common Errors
