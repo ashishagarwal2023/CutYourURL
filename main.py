@@ -13,13 +13,13 @@ import flask_login as fl
 import schedule
 from dotenv import load_dotenv
 from flask import (
-    Flask,
-    render_template,
-    redirect,
-    request,
-    g,
-    jsonify,
-)
+	Flask,
+	render_template,
+	redirect,
+	request,
+	g,
+	jsonify,
+	)
 
 import otp as o
 import valid
@@ -97,7 +97,7 @@ def get_db():
         try:
             db = g._database = sqlite3.connect(DATABASE)
         except sqlite3.OperationalError:
-            print("Found no database, migtht be deleted. Restoring database!")
+            print("Restoring Database")
             os.execl(sys.executable, sys.executable, *sys.argv)
         db.execute("PRAGMA foreign_keys = ON")
     return db
@@ -115,7 +115,6 @@ def init_db():
     db = get_db()
     with app.open_resource("schema.sql", mode="r") as f:
         db.cursor().executescript(f.read())
-        print("DB Loaded")
     db.commit()
 
 
