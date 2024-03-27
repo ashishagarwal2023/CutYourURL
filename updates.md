@@ -2,6 +2,7 @@
 
 ## New Features
 
+- Users can no longer register as `None` which would be a glitch allowing them to own most things
 - Added column "createdBy"
 - Column "createdBy" also appears in the recents
 - Only logged-in users can now make shorts
