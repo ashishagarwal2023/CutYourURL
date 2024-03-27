@@ -1,9 +1,14 @@
-# 26 March 2024:
+# 27 March 2024:
 
-## News
+## New Features
 
-- Fixed a bug where the DB is instantly cleared when initialized
+- Added column "createdBy"
+- Column "createdBy" also appears in the recents
+- Only logged-in users can now make shorts
 
-This bug made URLs automatically delete, or just not save, I've fixed it.
+And for a security patch, I've added auto-logout.
+- Added Auto-logout for whenever needed
 
-> We've added several features comparing to Bitly's, soon we'll be going to add a dashboard and etc so that we complete it!
+You will automatically be logged out if you're logged in while the server doesn't have your information (because of some issues) from now on.
+
+> Very soon, coming to not allow you to attempt to re-make a short that was made by someone else.
