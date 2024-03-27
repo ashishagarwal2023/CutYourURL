@@ -13,13 +13,13 @@ import flask_login as fl
 import schedule
 from dotenv import load_dotenv
 from flask import (
-	Flask,
-	render_template,
-	redirect,
-	request,
-	g,
-	jsonify,
-	)
+    Flask,
+    render_template,
+    redirect,
+    request,
+    g,
+    jsonify,
+)
 
 import otp as o
 import valid
@@ -32,7 +32,6 @@ login_manager = fl.LoginManager()
 
 # Variables, should be modified to your needs!
 black_shorts = [
-    # back again
     "new",
     "home",
     "website",
@@ -50,6 +49,10 @@ SCHEMA_FILE = os.getenv("SCHEMA_FILE")
 captchaSiteKey = os.getenv("captchaSiteKey")
 spoofDomain = os.getenv("spoofDomain")
 secretKey = os.getenv("secretKey")
+
+app = Flask(__name__)
+login_manager.init_app(app)
+app.secret_key = secretKey
 
 
 def job():
@@ -117,10 +120,6 @@ def init_db():
         db.cursor().executescript(f.read())
     db.commit()
 
-
-app = Flask(__name__)
-login_manager.init_app(app)
-app.secret_key = secretKey
 
 # Load DB
 with sqlite3.connect(LOGIN_DB) as db:
