@@ -397,3 +397,7 @@ details[open] summary {
 	font-size:24px;
 	margin:3px auto auto;
 }
+
+a.btn, a.btn:hover, a.btn:active{
+	text-decoration: none;
+}

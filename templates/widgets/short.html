@@ -1,27 +1,25 @@
 {% block contents %}
 	{% if not username.strip() == '' %}
-	<form action="{{ url_for('short') }}" method="post">
-		<div id="shortForm">
-			<input type="text" name="url" placeholder="Enter the link here">
-			<div id="submitBtn">
-				<input type="submit" value="Cut!">
+	<form action="{{ url_for('short') }}" method="post" class="form-group">
+		<div id="shortForm" class="form-row">
+			<input type="text" name="url" placeholder="Enter the link here" class="form-control" required>
+			<div id="submitBtn" class="form-group">
+				<input type="submit" value="Cut!" class="btn btn-primary">
 			</div>
-		</div>
-		<p>
+		</div>		<p>
 		<details>
 			<summary>Advanced Options:</summary>
 			<div class="left-column">
 				<label for="captcha">Enable Captcha Security? </label>
-				<input type="checkbox" id="captcha" name="captcha">
+				<input type="checkbox" id="captcha" name="captcha" class="form-check-input">
 				<br>
-				<label for="customSlug">Custom Slug? </label>
-				<input type="checkbox" id="customSlug" name="customSlug" onchange="toggleCustomSlug()">
-				<input type="text" id="slugInput" name="slugInput" value="XXXXXX" readonly minlength="6" maxlength="6"
+				<label for="customSlug">Custom Slug: </label>
+				<input type="text" id="slugInput" name="slugInput" value="XXXXXX" minlength="6" maxlength="6"
 					   required oninput="enforceSlugInputRestrictions()">
 			</div>
 			<div class="right-column">
 				<label for="public">Public? </label>
-				<input type="checkbox" id="public" checked name="public">
+				<input type="checkbox" id="public" checked name="public" class="form-check-input">
 				<br>
 				<label for="expiryClicks">Auto-delete after (clicks): </label>
 				<select name="expiryClicks" id="expiryClicks">
@@ -35,7 +33,7 @@
 		</details>
 		</p>
 	</form>
-	<script>
+		<script>
 		let expiryDateSelectBox = document.getElementById("expiryDate");
 		let days = [1, 2, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180];
 		for (let i = 0; i < days.length; i++) {

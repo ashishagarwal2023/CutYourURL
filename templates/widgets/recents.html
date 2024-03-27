@@ -1,6 +1,6 @@
 {% block content %}
-	<section id="coming" class="recents">
-		<h1>Recent (Public) Shorts</h1><br>
+	<section id="coming" class="recents table-responsive">
+		<h1 class="h3">Recent (Public) Shorts</h1><br>
 		{% if recents %}
 			<table>
 				<thead>
@@ -13,7 +13,6 @@
 				</tr>
 				</thead>
 				<tbody>
-
 				{% for row in recents %}
 					<tr>
 						<td>{{ row[0] }}</td>
@@ -26,7 +25,7 @@
 				</tbody>
 			</table>
 		{% else %}
-			<h2>No rows found</h2>
+			<h2 class="h5">No rows found</h2>
 			<p>Generate your first short to be featured!</p>
 		{% endif %}
 	</section>

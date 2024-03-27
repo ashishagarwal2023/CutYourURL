@@ -1,11 +1,6 @@
 {% block contents %}
 	{% if (not verified) and username %}
 		<style>
-			html {
-				margin: 0;
-				padding: 0;
-			}
-
 			.top-banner {
 				margin-bottom: 30px;
 				backdrop-filter: blur(4px) saturate(177%);
@@ -15,33 +10,16 @@
 				text-align: center;
 				z-index: 99;
 			}
-
-			.top-banner a, .top-banner span {
-				display: inline-block;
-			}
-
-			.top-banner a {
-				width: 100%;
-				padding: 15px 0;
+			.alert-link, .alert-link:hover{
 				text-decoration: none;
-				color: #e17900;
+				color: #2d2d2d;
 			}
-
-			.top-banner span {
-				line-height: 28px;
-				padding: 0 10px;
-				background-color: #0278d9;
-				border-radius: 20px;
-				color: white;
-			}
-
-			.sticky {
-				position: fixed;
-				width: 100%;
+			.badge.bg-primary{
+				margin-left:3px;
 			}
 		</style>
-		<div class="top-banner">
-			<a href="/account">You are not currently verified. <span>Verify now</span></a>
+		<div class="top-banner alert alert-warning">
+			<a href="/account" class="alert-link">You are not currently verified. <span class="badge bg-primary">Verify now</span></a>
 		</div>
 		<script>
 			let banner = document.querySelector('div.top-banner');

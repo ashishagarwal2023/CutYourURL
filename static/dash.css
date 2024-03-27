@@ -154,7 +154,7 @@ hr {
 	background: #a6bd00;
 }
 .btn:disabled{
-	opacity: 0.3;
+		opacity: 0.3;
 }
 
 input.email , input.otp{
