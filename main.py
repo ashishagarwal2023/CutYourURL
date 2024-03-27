@@ -13,13 +13,13 @@ import flask_login as fl
 import schedule
 from dotenv import load_dotenv
 from flask import (
-	Flask,
-	render_template,
-	redirect,
-	request,
-	g,
-	jsonify,
-	)
+    Flask,
+    render_template,
+    redirect,
+    request,
+    g,
+    jsonify,
+    )
 
 import otp as o
 import valid
@@ -489,6 +489,9 @@ def signup():
         email = flask.request.form["email"]
         password = flask.request.form["password"]
         confirm_password = flask.request.form["confirmPassword"]
+
+        if username == "None":
+            return render_template("login.html", error = 5)
 
         if password != confirm_password:  # Passwords are not equal
             return render_template(

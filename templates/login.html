@@ -50,6 +50,7 @@
 			<button type="submit">Sign Up</button>
 			<p>Already have an account? <span id="login-link">Login</span></p>
 			<p class="error" id="signup_pass">Passwords do not match.</p>
+			<p class="error" id="block">Username is not allowed</p>
 			<p class="error" id="signup_user">Username is taken.</p>
 			<p class="error" id="wrong">Username contains spaces</p>
 			<p class="error" id="error">Unknown server error</p>
@@ -81,6 +82,7 @@
 		const signup_pass = document.getElementById('signup_pass'); // Passwords do not match
 		const signup_user = document.getElementById('signup_user'); // Username is taken
 		const wrong = document.getElementById("wrong");
+		const block = document.getElementById("block");
 		const error2 = document.getElementById('error'); // Email is taken
 
 		loginForm.style.display = 'block';
@@ -90,6 +92,7 @@
 		login_invalid.style.display = 'none';
 		signup_user.style.display = 'none';
 		wrong.style.display = "none";
+		block.style.display = "none";
 
 		let error = {{error}};
 		if (error == 0) {
@@ -97,16 +100,18 @@
 			signupForm.style.display = 'none';
 			login_invalid.style.display = 'block';
 			signup_user.style.display = 'none';
+			block.style.display = "none";
 			wrong.style.display = "none";
 			signup_pass.style.display = 'none';
 			error2.style.display = "none";
 		} else {
-			if (error == 1 || error == 2 | error == 3 || error == 4) {
+			if (error == 1 || error == 2 | error == 3 || error == 4 || error == 5) {
 				loginForm.style.display = 'none';
 				signupForm.style.display = 'block';
 				if (error == 1) {
 					signup_pass.style.display = 'block';
 					signup_user.style.display = 'none';
+					block.style.display = "none";
 					wrong.style.display = "none";
 					error2.style.display = "none";
 					login_invalid.style.display = 'none';
@@ -114,6 +119,7 @@
 					if (error == 2) {
 						signup_user.style.display = 'block';
 						signup_pass.style.display = 'none';
+						block.style.display = "none";
 						wrong.style.display = "none";
 						login_invalid.style.display = 'none';
 						error2.style.display = "none";
@@ -123,6 +129,7 @@
 							signup_user.style.display = 'none';
 							signup_pass.style.display = 'none';
 							wrong.style.display = "none";
+							block.style.display = "none";
 							login_invalid.style.display = 'none';
 						} else {
 							if (error == 4) {
@@ -130,7 +137,17 @@
 								error2.style.display = "none";
 								signup_user.style.display = 'none';
 								signup_pass.style.display = 'none';
+								block.style.display = "none";
 								login_invalid.style.display = 'none';
+							} else {
+								if (error == 5) {
+									block.style.display = "block";
+									wrong.style.display = "none";
+									error2.style.display = "none";
+									signup_user.style.display = 'none';
+									signup_pass.style.display = 'none';
+									login_invalid.style.display = 'none';
+								}
 							}
 						}
 					}
