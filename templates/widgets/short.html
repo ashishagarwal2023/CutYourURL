@@ -1,4 +1,5 @@
 {% block contents %}
+	{% if not username.strip() == '' %}
 	<form action="{{ url_for('short') }}" method="post">
 		<div id="shortForm">
 			<input type="text" name="url" placeholder="Enter the link here">
@@ -77,4 +78,10 @@
 			input.value = input.value.replace(/[^A-Z0-9-_]/g, '');
 		}
 	</script>
+	{% else %}
+		<div id="shortForm" class="centered">
+		<p class="centered">Hey there, buddy! Come, login or signup to have a experience of the ultimate, free custom URL Shortener! It's free, just give it 1 minute, because why not?</p>
+			<p class="centered">You need to register on the site before you can short a link.</p>
+		</div>
+	{% endif %}
 {% endblock %}

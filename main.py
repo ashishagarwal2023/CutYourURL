@@ -13,13 +13,13 @@ import flask_login as fl
 import schedule
 from dotenv import load_dotenv
 from flask import (
-    Flask,
-    render_template,
-    redirect,
-    request,
-    g,
-    jsonify,
-)
+	Flask,
+	render_template,
+	redirect,
+	request,
+	g,
+	jsonify,
+	)
 
 import otp as o
 import valid
@@ -53,6 +53,13 @@ secretKey = os.getenv("secretKey")
 app = Flask(__name__)
 login_manager.init_app(app)
 app.secret_key = secretKey
+
+
+def loggedIn():
+    loggedInAcc = fl.current_user.is_authenticated
+    if loggedInAcc:
+        return fl.current_user.id
+    return ""
 
 
 def job():
@@ -212,6 +219,7 @@ def verify_otp_for_user(username, otp):
 # Like to add the URL to database, check if it already exists.
 def shortUrl(url, length, captcha, visb, expiryDate):
     db = get_db()
+    user = loggedIn()
     expiryClicks = int(request.form.get("expiryClicks"))
     if not float(expiryDate) == 0:
         expiryDate = getTime(float(expiryDate))
@@ -258,9 +266,11 @@ def shortUrl(url, length, captcha, visb, expiryDate):
         captcha_enabled = True
 
     cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks, expiryDate) VALUES (?, ?, ?, "
-        "?, ?, ?)",
-        (short_url, url, captcha_enabled, visb, expiryClicks, expiryDate),
+        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks, expiryDate, createdBy) "
+        "VALUES (?, ?, "
+        "?, "
+        "?, ?, ?, ?)",
+        (short_url, url, captcha_enabled, visb, expiryClicks, expiryDate, user),
     )
     db.commit()
     cursor.close()
@@ -274,6 +284,19 @@ def before_request():
         init_db()
         g._got_first_request = True
 
+    # Check if the user is authenticated
+    if fl.current_user.is_authenticated:
+        username = fl.current_user.id
+
+        # Check if the user's data still exists in the login database
+        with sqlite3.connect(LOGIN_DB) as db:
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM users WHERE username=?", (username,))
+            user = cursor.fetchone()
+
+        # If the user's data does not exist, log them out
+        if user is None:
+            fl.logout_user()
 
 # Homepage
 @app.route("/", methods=["GET", "POST"])
@@ -307,6 +330,10 @@ def short():
     username = ""
     if fl.current_user.is_authenticated:
         username = fl.current_user.id
+    else:
+        return render_template(
+            "generated.html", data=[""], username=username, verified=True
+        )
     if request.method == "POST":
         try:
             url = request.form.get("url")
@@ -466,6 +493,9 @@ def signup():
             return render_template(
                 "login.html", error=1
             )  # Client Error : Passwords do not match
+
+        if username.strip() == "" or " " in username: # Username Includes space
+            return render_template("login.html", error=4)
 
         db = sqlite3.connect(LOGIN_DB)
         cursor = db.cursor()

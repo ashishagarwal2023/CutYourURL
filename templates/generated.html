@@ -13,9 +13,20 @@
 <body>
 {% include 'widgets/status.html' %}
 <main>
-
-	{% include "widgets/user.html" %}
-
+{% include "widgets/user.html" %}
+{% if username.strip() == '' %}
+	<section id="short" class="main error">
+		<h1>Not right now!</h1>
+		<p>Appears like you tried to short a URL, but without logging in. Here's what you can do:</p>
+		<ul>
+			<li class="yes">Login or Signup</li>
+			<li class="yes">Have a account</li>
+		</ul>
+		<p>
+			<a href="/" class="comingBtn">Return to Home</a>
+			<a href="/login" class="comingBtn">Login/Signup</a></p>
+	</section>
+	{% else %}
 	<section id="short" class="main error" style="display:none;">
 		<h1>An error occurred creating the short URL</h1>
 		<p>The URL has not been shortened, possible errors:</p>
@@ -61,7 +72,7 @@
 
 		</div>
 	</section>
-
+{% endif %}
 	<section id="content">
 		<h2>Why did I recieved "Invalid URL" error?</h2>
 		<p>
@@ -156,7 +167,6 @@
 		}
 	});
 </script>
-
 </body>
 
 </html>

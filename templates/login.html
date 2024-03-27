@@ -51,6 +51,7 @@
 			<p>Already have an account? <span id="login-link">Login</span></p>
 			<p class="error" id="signup_pass">Passwords do not match.</p>
 			<p class="error" id="signup_user">Username is taken.</p>
+			<p class="error" id="wrong">Username contains spaces</p>
 			<p class="error" id="error">Unknown server error</p>
 		</form>
 	</div>
@@ -79,6 +80,7 @@
 		const login_invalid = document.getElementById('login_invalid'); // Invalid credentials
 		const signup_pass = document.getElementById('signup_pass'); // Passwords do not match
 		const signup_user = document.getElementById('signup_user'); // Username is taken
+		const wrong = document.getElementById("wrong");
 		const error2 = document.getElementById('error'); // Email is taken
 
 		loginForm.style.display = 'block';
@@ -87,6 +89,7 @@
 		signup_pass.style.display = 'none';
 		login_invalid.style.display = 'none';
 		signup_user.style.display = 'none';
+		wrong.style.display = "none";
 
 		let error = {{error}};
 		if (error == 0) {
@@ -94,21 +97,24 @@
 			signupForm.style.display = 'none';
 			login_invalid.style.display = 'block';
 			signup_user.style.display = 'none';
+			wrong.style.display = "none";
 			signup_pass.style.display = 'none';
 			error2.style.display = "none";
 		} else {
-			if (error == 1 || error == 2 | error == 3) {
+			if (error == 1 || error == 2 | error == 3 || error == 4) {
 				loginForm.style.display = 'none';
 				signupForm.style.display = 'block';
 				if (error == 1) {
 					signup_pass.style.display = 'block';
 					signup_user.style.display = 'none';
+					wrong.style.display = "none";
 					error2.style.display = "none";
 					login_invalid.style.display = 'none';
 				} else {
 					if (error == 2) {
 						signup_user.style.display = 'block';
 						signup_pass.style.display = 'none';
+						wrong.style.display = "none";
 						login_invalid.style.display = 'none';
 						error2.style.display = "none";
 					} else {
@@ -116,7 +122,16 @@
 							error2.style.display = "block";
 							signup_user.style.display = 'none';
 							signup_pass.style.display = 'none';
+							wrong.style.display = "none";
 							login_invalid.style.display = 'none';
+						} else {
+							if (error == 4) {
+								wrong.style.display = "block";
+								error2.style.display = "none";
+								signup_user.style.display = 'none';
+								signup_pass.style.display = 'none';
+								login_invalid.style.display = 'none';
+							}
 						}
 					}
 				}
