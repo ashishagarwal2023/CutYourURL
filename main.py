@@ -83,7 +83,8 @@ def recents(length=6):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        f"SELECT short_url, original_url, views, inserted_at FROM short_urls WHERE public = 1 ORDER BY datetime("
+        f"SELECT short_url, original_url, views, inserted_at, createdBy FROM short_urls WHERE public = 1 ORDER BY "
+        f"datetime("
         f"inserted_at) DESC LIMIT {length}"
     )
     rows = cursor.fetchall()
