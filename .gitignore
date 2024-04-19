@@ -1,5 +1,6 @@
 ./cache/
 .venv/
+credentials.json
 cache/
 ./token.pickle
 token.pickle
