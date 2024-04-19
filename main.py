@@ -8,7 +8,6 @@ import time
 from datetime import datetime, timedelta
 from logging.handlers import TimedRotatingFileHandler
 
-import flask
 import schedule
 from dotenv import load_dotenv
 from flask import (
@@ -17,6 +16,7 @@ from flask import (
 	redirect,
 	request,
 	g,
+	jsonify,
 	)
 
 import valid
@@ -41,7 +41,7 @@ dir_name = os.getenv("dir_name")
 DATABASE = os.getenv("DATABASE")
 log_file_path = os.getenv("log_file_path")
 SCHEMA_FILE = os.getenv("SCHEMA_FILE")
-captchaSiteKey = os.getenv("captchaSiteKey")
+# captchaSiteKey = os.getenv("captchaSiteKey")
 spoofDomain = os.getenv("spoofDomain")
 secretKey = os.getenv("secretKey")
 
@@ -140,7 +140,7 @@ def gen_short(length=6):
     return short_id
 
 
-def shortUrl(url, length, captcha, visb, expiryDate):
+def shortUrl(url, length, visb, expiryDate):
     db = get_db()
     expiryClicks = int(request.form.get("expiryClicks"))
     if not float(expiryDate) == 0:
@@ -178,15 +178,10 @@ def shortUrl(url, length, captcha, visb, expiryDate):
             if not existing_short_url:
                 break
             short_url = gen_short(length)
-
-    captcha_enabled = False
-    if int(captcha) == 1:
-        captcha_enabled = True
-
     cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks, expiryDate) "
+        "INSERT INTO short_urls (short_url, original_url, public, expiryClicks, expiryDate) "
         "VALUES (?, ?, ?, ?, ?, ?)",
-        (short_url, url, captcha_enabled, visb, expiryClicks, expiryDate),
+        (short_url, url, visb, expiryClicks, expiryDate),
     )
     db.commit()
     cursor.close()
@@ -195,64 +190,68 @@ def shortUrl(url, length, captcha, visb, expiryDate):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.jinja", recents=recents(5), cutText=cutText)
+    return redirect("https://github.com/ashishagarwal2023/cutyoururl")
+
+
+@app.route("/recents", methods=["GET", "POST"])
+def recentsRoute():
+    data = recents(5)
+    transformed_data = []
+
+    for entry in data:
+        transformed_data.append(
+            {"id": entry[0], "dest": entry[1], "views": entry[2], "created": entry[3]}
+        )
+
+    return jsonify(transformed_data)
 
 
 @app.route("/short", methods=["POST", "GET"])
 def short():
-    if request.method == "POST":
-        try:
-            url = request.form.get("url")
-            expiryDate = float(request.form.get("expiryDate"))
-            isPublic = request.form.get("public")
-            captchaEnabled = "captcha" in request.form
+    try:
+        url = request.form.get("url")
+        expiryDate = float(request.form.get("expiryDate"))
+        isPublic = request.form.get("public")
 
-            if valid.verify(url):
-                pass
-            else:
-                return render_template(
-                    "generated.jinja",
-                    data=["err", ""],
-                )
-            db = get_db()
-            Vcursor = db.cursor()
-            Vcursor.execute("SELECT views FROM short_urls WHERE original_url=?", (url,))
-            views = Vcursor.fetchone()
-
-            app.logger.info(f"POST request received for URL: {url}")
-
-            short_url = shortUrl(
-                url, 6, captcha=captchaEnabled, visb=isPublic, expiryDate=expiryDate
-            )
-            if views == None:
-                app.logger.info(f"Generated new short URL: /{short_url}\n")
-            else:
-                app.logger.info(f"Returning already-generated URL: /{short_url}\n")
-            full = f"{spoofDomain}{short_url}"
-            views = views[0] if views else 0
-            qrURI = qr(full)
-            app.logger.info(f"Generated QR Code URI from: {full}\n")
-            croppedURL = cutText(url, 30)
+        if valid.verify(url):
+            pass
+        else:
             return render_template(
                 "generated.jinja",
-                full=full,
-                url=url,
-                views=views,
-                qrURI=qrURI,
-                captchaEnabled=captchaEnabled,
-                cropped=croppedURL,
+                data=["err", ""],
             )
-        except Exception as e:
-            app.logger.error(f"Server exception during shorting: {e}\n")
-            print(e)
-            return render_template(
-                "generated.jinja",
-                data=["exc"],
-                cropped="",
-            )
-    else:
-        app.logger.error(f"GET request received without parameters for /short\n")
-        return redirect("/")
+        db = get_db()
+        Vcursor = db.cursor()
+        Vcursor.execute("SELECT views FROM short_urls WHERE original_url=?", (url,))
+        views = Vcursor.fetchone()
+
+        app.logger.info(f"POST request received for URL: {url}")
+
+        short_url = shortUrl(url, 6, visb=isPublic, expiryDate=expiryDate)
+        if views == None:
+            app.logger.info(f"Generated new short URL: /{short_url}\n")
+        else:
+            app.logger.info(f"Returning already-generated URL: /{short_url}\n")
+        full = f"{spoofDomain}{short_url}"
+        views = views[0] if views else 0
+        qrURI = qr(full)
+        app.logger.info(f"Generated QR Code URI from: {full}\n")
+        croppedURL = cutText(url, 30)
+        return jsonify(
+            {
+                "full": full,
+                "url": url,
+                "views": views,
+                "qrURI": qrURI,
+                "cropped": croppedURL,
+                "path": short_url,
+            }
+        )
+
+    except Exception as e:
+        app.logger.error(f"Server exception during shorting: {e}\n")
+        print(e)
+        return jsonify({"error": f"{e}"}), 500
 
 
 @app.route(f"/{dir_name}/<short_url>")
@@ -261,63 +260,13 @@ def redr_url(short_url):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        "SELECT original_url, captcha, views, expiryClicks FROM short_urls WHERE short_url=?",
+        "SELECT original_url, views, expiryClicks FROM short_urls WHERE short_url=?",
         (short_url,),
     )
     url_info = cursor.fetchone()
 
     if url_info:
-        original_url, captcha, views, expiryClicks = url_info
-        if captcha:
-            app.logger.info(f"Redirecting to captcha page for short URL: {short_url}")
-            return render_template(
-                "captcha.jinja",
-                redirectURL=original_url,
-                captchaKey=captchaSiteKey,
-                short_id=short_url,
-            )
-        views += 1
-        if views >= expiryClicks and expiryClicks != 0:
-            cursor.execute(
-                "DELETE FROM short_urls WHERE short_url=?",
-                (short_url,),
-            )
-        else:
-            cursor.execute(
-                "UPDATE short_urls SET views=? WHERE short_url=?",
-                (
-                    views,
-                    short_url,
-                ),
-            )
-        db.commit()
-        cursor.close()
-        app.logger.info(f"Redirecting to original URL: {original_url}")
-        return redirect(original_url)
-    else:
-        app.logger.error("Short URL not found")
-        return redirect("/")
-
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return redirect("/")
-
-
-@app.route("/captcha", methods=["POST"])
-def captcha():
-    short_url = flask.request.form["short_url"]
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute(
-        "SELECT original_url, views FROM short_urls WHERE short_url=?",
-        (short_url,),
-    )
-    url_info = cursor.fetchone()
-
-    if url_info:
-        original_url, views = url_info
-        views += 1
+        original_url, views, expiryClicks = url_info
         cursor.execute(
             "UPDATE short_urls SET views=? WHERE short_url=?",
             (
@@ -327,10 +276,16 @@ def captcha():
         )
         db.commit()
         cursor.close()
-        return original_url
+        app.logger.info(f"Redirecting to original URL: {original_url}")
+        return jsonify({"dest": original_url}), 200
     else:
-        print("not found")
-        return redirect("/")
+        app.logger.error("Short URL not found")
+        return jsonify({"error": 404}), 404
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect("/")
 
 
 if __name__ == "__main__":
