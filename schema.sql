@@ -9,6 +9,6 @@ CREATE TABLE IF NOT EXISTS short_urls
 	captcha      INTEGER   DEFAULT 0,
 	public BOOLEAN DEFAULT TRUE,
 	expiryClicks INTEGER DEFAULT 0,
-	expiryDate TIMESTAMP DEFAULT NULL,
-	createdBy TEXT
+	expiryDate TIMESTAMP DEFAULT NULL
+-- 	createdBy TEXT
 );

@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 from logging.handlers import TimedRotatingFileHandler
 
 import flask
-import flask_login as fl
 import schedule
 from dotenv import load_dotenv
 from flask import (
@@ -18,17 +17,13 @@ from flask import (
 	redirect,
 	request,
 	g,
-	jsonify,
 	)
 
-import otp as o
 import valid
 from delete_expired import delete_expired_urls
 from qr import qr
 
 load_dotenv()
-
-login_manager = fl.LoginManager()
 
 # Variables, should be modified to your needs!
 black_shorts = [
@@ -51,15 +46,6 @@ spoofDomain = os.getenv("spoofDomain")
 secretKey = os.getenv("secretKey")
 
 app = Flask(__name__)
-login_manager.init_app(app)
-app.secret_key = secretKey
-
-
-def loggedIn():
-    loggedInAcc = fl.current_user.is_authenticated
-    if loggedInAcc:
-        return fl.current_user.id
-    return ""
 
 
 def job():
@@ -83,7 +69,7 @@ def recents(length=6):
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
-        f"SELECT short_url, original_url, views, inserted_at, createdBy FROM short_urls WHERE public = 1 ORDER BY "
+        f"SELECT short_url, original_url, views, inserted_at FROM short_urls WHERE public = 1 ORDER BY "
         f"datetime("
         f"inserted_at) DESC LIMIT {length}"
     )
@@ -95,11 +81,6 @@ def recents(length=6):
 def getTime(add):
     now = datetime.now()
     return now + timedelta(days=add)
-
-
-def get_login():
-    logindb = sqlite3.connect(LOGIN_DB)
-    return logindb
 
 
 def get_db():
@@ -114,27 +95,17 @@ def get_db():
     return db
 
 
-# Close DB function
 def close_db(exception=None):
     db = getattr(g, "_database", None)
     if db is not None:
         db.close()
 
 
-# To make shorts db from schema
 def init_db():
     db = get_db()
     with app.open_resource("schema.sql", mode="r") as f:
         db.cursor().executescript(f.read())
     db.commit()
-
-
-# Load DB
-with sqlite3.connect(LOGIN_DB) as db:
-    cursor = db.cursor()
-    q = "SELECT * FROM users"
-    cursor.execute(q, ())
-    users = cursor.fetchall()
 
 
 def cutText(text, length):
@@ -144,42 +115,12 @@ def cutText(text, length):
         return text[: (length - 3)] + "..."
 
 
-# User class
-class User(fl.UserMixin):
-    def __init__(self, username):
-        db = sqlite3.connect(LOGIN_DB)
-        cursor = db.cursor()
-        q = "SELECT * FROM users WHERE username = ?"
-        user = cursor.execute(q, (username,)).fetchone()
-        self.id = username
-
-
-# Flask_login related tasks for Login/Signup
-@login_manager.user_loader
-def user_loader(username):
-    return User(username)
-
-
-@login_manager.request_loader
-def request_loader(request):
-    username = request.form.get("username")
-    if username not in users:
-        return
-
-    user = User()
-    user.id = username
-    return user
-
-
-# Make dir for logs if it does not exist
 log_dir = os.path.dirname(log_file_path)
 os.makedirs(log_dir, exist_ok=True)
 
-# Make log file
 if not os.path.exists(log_file_path):
     open(log_file_path, "a").close()
 
-# Initialize logging
 log_formatter = logging.Formatter(
     "[%(asctime)s] %(levelname)s: %(message)s", datefmt="%d %b %Y at %H:%M:%S"
 )
@@ -191,7 +132,6 @@ app.logger.addHandler(log_handler)
 app.logger.setLevel(logging.DEBUG)
 
 
-# Random ID Generator Method
 def gen_short(length=6):
     chars = string.ascii_letters + string.digits
     short_id = "".join(random.choice(chars) for _ in range(length))
@@ -200,27 +140,8 @@ def gen_short(length=6):
     return short_id
 
 
-def verify_otp_for_user(username, otp):
-    logindb = get_login()
-    cursorlogin = logindb.cursor()
-    cursorlogin.execute("SELECT OTP FROM users WHERE username=?", (username,))
-    result = int(cursorlogin.fetchone()[0])
-    otp = int(otp)
-
-    if otp == result:
-        cursorlogin.execute("UPDATE users SET verified=1 WHERE username=?", (username,))
-        logindb.commit()
-        cursorlogin.close()
-        return True
-    else:
-        return False
-
-
-# After a short URL id is made, this function holds the further tasks
-# Like to add the URL to database, check if it already exists.
 def shortUrl(url, length, captcha, visb, expiryDate):
     db = get_db()
-    user = loggedIn()
     expiryClicks = int(request.form.get("expiryClicks"))
     if not float(expiryDate) == 0:
         expiryDate = getTime(float(expiryDate))
@@ -235,13 +156,10 @@ def shortUrl(url, length, captcha, visb, expiryDate):
         cursor.close()
         return f"{dir_name}/{existing_short_url[0]}"
 
-    # Retrieve the custom slug value from the form data
     customSlug = request.form.get("slugInput")
-    # Replace all 'X' in the customSlug with a random character
     for _ in range(customSlug.count("X")):
         customSlug = customSlug.replace("X", gen_short(1), 1)
 
-    # Check if custom slug is provided and not already in use
     if customSlug and not customSlug.isspace():
         cursor.execute("SELECT * FROM short_urls WHERE short_url=?", (customSlug,))
         existing_short_url = cursor.fetchone()
@@ -252,7 +170,6 @@ def shortUrl(url, length, captcha, visb, expiryDate):
     else:
         short_url = gen_short(length)
 
-    # Only generate a new short_url if a custom slug was not provided or was already in use
     short_url = customSlug
     if not customSlug or existing_short_url:
         while True:
@@ -267,116 +184,51 @@ def shortUrl(url, length, captcha, visb, expiryDate):
         captcha_enabled = True
 
     cursor.execute(
-        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks, expiryDate, createdBy) "
-        "VALUES (?, ?, "
-        "?, "
-        "?, ?, ?, ?)",
-        (short_url, url, captcha_enabled, visb, expiryClicks, expiryDate, user),
+        "INSERT INTO short_urls (short_url, original_url, captcha, public, expiryClicks, expiryDate) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (short_url, url, captcha_enabled, visb, expiryClicks, expiryDate),
     )
     db.commit()
     cursor.close()
     return f"{dir_name}/{short_url}"
 
 
-# Init db to make sure it exists (only for shorts.db)
-@app.before_request
-def before_request():
-    if not getattr(g, "_got_first_request", None):
-        init_db()
-        g._got_first_request = True
-
-    # Check if the user is authenticated
-    if fl.current_user.is_authenticated:
-        username = fl.current_user.id
-
-        # Check if the user's data still exists in the login database
-        with sqlite3.connect(LOGIN_DB) as db:
-            cursor = db.cursor()
-            cursor.execute("SELECT * FROM users WHERE username=?", (username,))
-            user = cursor.fetchone()
-
-        # If the user's data does not exist, log them out
-        if user is None:
-            fl.logout_user()
-
-
-# Homepage
 @app.route("/", methods=["GET", "POST"])
 def index():
-    logindb = get_login()
-    cursorlogin = logindb.cursor()
-    verified = True
-    if fl.current_user.is_authenticated:
-        username = fl.current_user.id
-        result = cursorlogin.execute(
-            "SELECT verified FROM users WHERE username=?", (username,)
-        ).fetchone()
-        if result:
-            verified = result[0]
-        else:
-            verified = True
-    else:
-        username = ""  # Guest username, is trimmed on client-side
-
-    return render_template(
-        "index.jinja",
-        username=username,
-        recents=recents(5),
-        cutText=cutText,
-        verified=verified,
-    )  # Recent shorts are supplied and username is too
+    return render_template("index.jinja", recents=recents(5), cutText=cutText)
 
 
-@app.route("/short", methods=["POST", "GET"])  # Route where links are shorted
+@app.route("/short", methods=["POST", "GET"])
 def short():
-    username = ""
-    if fl.current_user.is_authenticated:
-        username = fl.current_user.id
-    else:
-        return render_template(
-            "generated.jinja", data=[""], username=username, verified=True
-        )
     if request.method == "POST":
         try:
             url = request.form.get("url")
             expiryDate = float(request.form.get("expiryDate"))
             isPublic = request.form.get("public")
             captchaEnabled = "captcha" in request.form
-            logindb = get_login()
-            cursorlogin = logindb.cursor()
-            verified = True
-            if fl.current_user.is_authenticated:
-                verified = cursorlogin.execute(
-                    "SELECT verified FROM users WHERE username=?", (username,)
-                ).fetchone()[0]
 
             if valid.verify(url):
-                pass  # The given URL is valid, we can continue to shorten it
+                pass
             else:
-                # The given URL is not valid, we can not continue with such a URL.
                 return render_template(
                     "generated.jinja",
                     data=["err", ""],
-                    username=username,
-                    verified=verified,
                 )
             db = get_db()
             Vcursor = db.cursor()
             Vcursor.execute("SELECT views FROM short_urls WHERE original_url=?", (url,))
-            views = (
-                Vcursor.fetchone()
-            )  # Gets the views of the URL, it will be None if its new generated, giving the idea of whether it is generated or existing.
+            views = Vcursor.fetchone()
 
             app.logger.info(f"POST request received for URL: {url}")
 
             short_url = shortUrl(
                 url, 6, captcha=captchaEnabled, visb=isPublic, expiryDate=expiryDate
             )
-            if views == None:  # None means its just generated
+            if views == None:
                 app.logger.info(f"Generated new short URL: /{short_url}\n")
-            else:  # Already existed
+            else:
                 app.logger.info(f"Returning already-generated URL: /{short_url}\n")
-            full = f"{spoofDomain}{short_url}"  # Generates a URL like http://127.0.0.1:5000/s/4n8MSl
+            full = f"{spoofDomain}{short_url}"
             views = views[0] if views else 0
             qrURI = qr(full)
             app.logger.info(f"Generated QR Code URI from: {full}\n")
@@ -387,24 +239,20 @@ def short():
                 url=url,
                 views=views,
                 qrURI=qrURI,
-                username=username,
                 captchaEnabled=captchaEnabled,
                 cropped=croppedURL,
-                verified=verified,
-            )  # Success
+            )
         except Exception as e:
             app.logger.error(f"Server exception during shorting: {e}\n")
             print(e)
             return render_template(
                 "generated.jinja",
                 data=["exc"],
-                username=username,
                 cropped="",
-                verified=verified,
-            )  # Server exception
+            )
     else:
         app.logger.error(f"GET request received without parameters for /short\n")
-        return redirect("/")  # GET without parameters, client error.
+        return redirect("/")
 
 
 @app.route(f"/{dir_name}/<short_url>")
@@ -429,9 +277,7 @@ def redr_url(short_url):
                 short_id=short_url,
             )
         views += 1
-        if (
-            views >= expiryClicks and expiryClicks != 0
-        ):  # Check if the expiry clicks limit has been reached
+        if views >= expiryClicks and expiryClicks != 0:
             cursor.execute(
                 "DELETE FROM short_urls WHERE short_url=?",
                 (short_url,),
@@ -453,100 +299,9 @@ def redr_url(short_url):
         return redirect("/")
 
 
-# The login route
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if flask.request.method == "GET" and not fl.current_user.is_authenticated:
-        return render_template("login.jinja", error="null")
-    # GET requests are when someone comes there without any data, like opened from address bar or bookmark or jumped
-    if not fl.current_user.is_authenticated:
-        username = flask.request.form["username"]
-        password = flask.request.form["password"]
-
-        db = sqlite3.connect(LOGIN_DB)
-        cursor = db.cursor()
-        cursor.execute("SELECT password FROM users WHERE username=?", (username,))
-        result = cursor.fetchone()
-
-        if (
-            result and password == result[0]
-        ):  # Result is the valid (actual, stored) password and password is the form's password
-            # If both are same, then we can login, because your password = correct password
-            user = User(username)
-            user.id = username
-            fl.login_user(user)
-            return flask.redirect("/")  # Redirect to home after being logged in
-
-        return render_template(
-            "login.jinja", error=0
-        )  # The password or username is invalid.
-    return redirect("/")  # The user is already logged in
-
-
-@app.route("/signup", methods=["GET", "POST"])  # Signup route
-def signup():
-    if flask.request.method == "POST" and not fl.current_user.is_authenticated:
-        username = flask.request.form["username"]
-        email = flask.request.form["email"]
-        password = flask.request.form["password"]
-        confirm_password = flask.request.form["confirmPassword"]
-
-        if username == "None":
-            return render_template("login.jinja", error=5)
-
-        if password != confirm_password:  # Passwords are not equal
-            return render_template(
-                "login.jinja", error=1
-            )  # Client Error : Passwords do not match
-
-        if username.strip() == "" or " " in username:  # Username Includes space
-            return render_template("login.jinja", error=4)
-
-        db = sqlite3.connect(LOGIN_DB)
-        cursor = db.cursor()
-
-        # Check if the username already exists
-        cursor.execute("SELECT COUNT(*) FROM users WHERE username=?", (username,))
-        count = cursor.fetchone()[0]
-        if count > 0:
-            return render_template(
-                "login.jinja", error=2
-            )  # Client Error : Username taken
-
-        otp = o.otp(username, email)
-        if not otp:
-            return render_template("login.jinja", error=3)
-
-        # Insert the new user record
-        cursor.execute(
-            "INSERT INTO users (username, email, password, OTP) VALUES (?, ?, ?, ?)",
-            (username, email, password, otp),
-        )  # Signed up
-        user = User(username)
-        user.id = username
-        fl.login_user(user)  # Login
-        db.commit()  # The account has been created and logged in now.
-
-        return flask.redirect("/")  # Successfully signed up!
-    else:
-        return flask.redirect(
-            "/"
-        )  # They are already logged in, or they are calling GET
-    # Must logout to signup/login
-
-
-# Logout account, if logged in. Nothing happens to guests.
-@app.route("/logout")
-def logout():
-    if fl.current_user.is_authenticated:
-        fl.logout_user()
-    return redirect("/")  # To the homepage
-
-
-# The 404 page
 @app.errorhandler(404)
 def page_not_found(e):
-    return redirect("/")  # 404 to homepage
+    return redirect("/")
 
 
 @app.route("/captcha", methods=["POST"])
@@ -574,95 +329,8 @@ def captcha():
         cursor.close()
         return original_url
     else:
+        print("not found")
         return redirect("/")
-
-
-@app.route("/account")
-def account():
-    logindb = get_login()
-    cursorlogin = logindb.cursor()
-    if fl.current_user.is_authenticated:
-        username = fl.current_user.id
-        verified = cursorlogin.execute(
-            "SELECT verified, email FROM users WHERE username=?", (username,)
-        ).fetchone()
-        email = verified[1]
-        verified = verified[0]
-        if verified == 1:
-            verified = True
-        else:
-            verified = False
-    else:
-        username = ""
-        return redirect("/login")
-    return render_template(
-        "account.jinja", email=email, username=username, verified=verified
-    )
-
-
-@app.route("/account/verifyOtp", methods=["POST"])
-def verify_otp():
-    data = request.get_json()
-    otp = data.get("otp")
-    username = data.get("username")
-    is_valid = verify_otp_for_user(username, otp)
-    return jsonify(is_valid)
-
-
-@app.route("/account/changeEmail", methods=["POST"])
-def change_email():
-    data = request.get_json()
-    new_email = data.get("email")
-    username = data.get("username")
-    logindb = get_login()
-    cursorlogin = logindb.cursor()
-    cursorlogin.execute(
-        "UPDATE users SET email=?, verified = 0 WHERE username=?", (new_email, username)
-    )
-    logindb.commit()
-    cursorlogin.close()
-    resend_otp()
-    return jsonify(True)
-
-
-@app.route("/account/resendOTP", methods=["POST"])
-def resend_otp():
-    data = request.get_json()
-    username = data.get("username")
-    logindb = get_login()
-    cursorlogin = logindb.cursor()
-    cursorlogin.execute("SELECT email FROM users WHERE username=?", (username,))
-    email = cursorlogin.fetchone()[0]
-    otp = o.otp(username, email)
-    cursorlogin.execute("UPDATE users SET OTP=? WHERE username=?", (otp, username))
-    logindb.commit()
-    cursorlogin.close()
-    return jsonify(True)
-
-
-@app.route("/account/changePassword", methods=["POST"])
-def change_password():
-    data = request.get_json()
-    new_pass = data.get("new_pass")
-    current_pass = data.get("current_pass")
-    username = data.get("username")
-    confirm_pass = data.get("confirm_pass")
-    logindb = get_login()
-    cursorlogin = logindb.cursor()
-    cursorlogin.execute("SELECT password FROM users WHERE username=?", (username,))
-    password = cursorlogin.fetchone()[0]
-    if password == current_pass:
-        if new_pass == confirm_pass and (not (current_pass == new_pass)):
-            cursorlogin.execute(
-                "UPDATE users SET password=? WHERE username=?", (new_pass, username)
-            )
-            logindb.commit()
-            cursorlogin.close()
-            return jsonify(True)
-        else:
-            return jsonify(False)
-    else:
-        return jsonify(False)
 
 
 if __name__ == "__main__":
