@@ -13,13 +13,13 @@ import flask_login as fl
 import schedule
 from dotenv import load_dotenv
 from flask import (
-    Flask,
-    render_template,
-    redirect,
-    request,
-    g,
-    jsonify,
-    )
+	Flask,
+	render_template,
+	redirect,
+	request,
+	g,
+	jsonify,
+	)
 
 import otp as o
 import valid
@@ -299,6 +299,7 @@ def before_request():
         if user is None:
             fl.logout_user()
 
+
 # Homepage
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -318,7 +319,7 @@ def index():
         username = ""  # Guest username, is trimmed on client-side
 
     return render_template(
-        "index.html",
+        "index.jinja",
         username=username,
         recents=recents(5),
         cutText=cutText,
@@ -333,7 +334,7 @@ def short():
         username = fl.current_user.id
     else:
         return render_template(
-            "generated.html", data=[""], username=username, verified=True
+            "generated.jinja", data=[""], username=username, verified=True
         )
     if request.method == "POST":
         try:
@@ -354,7 +355,7 @@ def short():
             else:
                 # The given URL is not valid, we can not continue with such a URL.
                 return render_template(
-                    "generated.html",
+                    "generated.jinja",
                     data=["err", ""],
                     username=username,
                     verified=verified,
@@ -381,7 +382,7 @@ def short():
             app.logger.info(f"Generated QR Code URI from: {full}\n")
             croppedURL = cutText(url, 30)
             return render_template(
-                "generated.html",
+                "generated.jinja",
                 full=full,
                 url=url,
                 views=views,
@@ -395,7 +396,7 @@ def short():
             app.logger.error(f"Server exception during shorting: {e}\n")
             print(e)
             return render_template(
-                "generated.html",
+                "generated.jinja",
                 data=["exc"],
                 username=username,
                 cropped="",
@@ -422,7 +423,7 @@ def redr_url(short_url):
         if captcha:
             app.logger.info(f"Redirecting to captcha page for short URL: {short_url}")
             return render_template(
-                "captcha.html",
+                "captcha.jinja",
                 redirectURL=original_url,
                 captchaKey=captchaSiteKey,
                 short_id=short_url,
@@ -456,7 +457,7 @@ def redr_url(short_url):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if flask.request.method == "GET" and not fl.current_user.is_authenticated:
-        return render_template("login.html", error="null")
+        return render_template("login.jinja", error="null")
     # GET requests are when someone comes there without any data, like opened from address bar or bookmark or jumped
     if not fl.current_user.is_authenticated:
         username = flask.request.form["username"]
@@ -477,7 +478,7 @@ def login():
             return flask.redirect("/")  # Redirect to home after being logged in
 
         return render_template(
-            "login.html", error=0
+            "login.jinja", error=0
         )  # The password or username is invalid.
     return redirect("/")  # The user is already logged in
 
@@ -491,15 +492,15 @@ def signup():
         confirm_password = flask.request.form["confirmPassword"]
 
         if username == "None":
-            return render_template("login.html", error = 5)
+            return render_template("login.jinja", error=5)
 
         if password != confirm_password:  # Passwords are not equal
             return render_template(
-                "login.html", error=1
+                "login.jinja", error=1
             )  # Client Error : Passwords do not match
 
-        if username.strip() == "" or " " in username: # Username Includes space
-            return render_template("login.html", error=4)
+        if username.strip() == "" or " " in username:  # Username Includes space
+            return render_template("login.jinja", error=4)
 
         db = sqlite3.connect(LOGIN_DB)
         cursor = db.cursor()
@@ -509,12 +510,12 @@ def signup():
         count = cursor.fetchone()[0]
         if count > 0:
             return render_template(
-                "login.html", error=2
+                "login.jinja", error=2
             )  # Client Error : Username taken
 
         otp = o.otp(username, email)
         if not otp:
-            return render_template("login.html", error=3)
+            return render_template("login.jinja", error=3)
 
         # Insert the new user record
         cursor.execute(
@@ -595,7 +596,7 @@ def account():
         username = ""
         return redirect("/login")
     return render_template(
-        "account.html", email=email, username=username, verified=verified
+        "account.jinja", email=email, username=username, verified=verified
     )
 
 

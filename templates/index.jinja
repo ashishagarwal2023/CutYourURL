@@ -10,17 +10,17 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-{% include 'widgets/status.html' %}
+{% include 'widgets/status.jinja' %}
 <main>
-	{% include 'widgets/user.html' %}
+	{% include 'widgets/user.jinja' %}
 
 	<section id="short" class="main">
 		<h2>CutYourURL URL Shortener</h2>
-		{% include 'widgets/short.html' %}
+		{% include 'widgets/short.jinja' %}
 		<p class="desc">Powerful free, open-source URL Shortener by <a href="https://github.com/ashishagarwal2023" target="_blank">ashishagarwal2023</a>!</p>
 	</section>
 
-	{% include 'widgets/recents.html' %}
+	{% include 'widgets/recents.jinja' %}
 
 	<section id="coming">
 		<h2>Coming soon...</h2>

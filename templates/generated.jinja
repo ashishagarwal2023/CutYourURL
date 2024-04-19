@@ -12,9 +12,9 @@
 </head>
 
 <body>
-{% include 'widgets/status.html' %}
+{% include 'widgets/status.jinja' %}
 <main>
-{% include "widgets/user.html" %}
+	{% include "widgets/user.jinja" %}
 {% if username.strip() == '' %}
 	<section id="short" class="main error">
 		<h1>Not right now!</h1>
