@@ -13,13 +13,13 @@ import flask_login as fl
 import schedule
 from dotenv import load_dotenv
 from flask import (
-	Flask,
-	render_template,
-	redirect,
-	request,
-	g,
-	jsonify,
-	)
+    Flask,
+    render_template,
+    redirect,
+    request,
+    g,
+    jsonify,
+)
 
 import otp as o
 import valid
@@ -703,7 +703,7 @@ def manageRouteFunc():
         username=username,
         cutText=cutText,
         shorts=shorts(5),
-        status=verified,
+        verified=verified,
     )
 
 
