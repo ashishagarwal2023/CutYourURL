@@ -92,6 +92,23 @@ def recents(length=6):
     return rows
 
 
+def shorts(length=6):
+    db = get_db()
+    cursor = db.cursor()
+    username = ""
+    if fl.current_user.is_authenticated:
+        username = fl.current_user.id
+    cursor.execute(
+        f"SELECT short_url, original_url, views, inserted_at, public FROM short_urls WHERE createdBy = ? ORDER BY "
+        f"datetime("
+        f"inserted_at) DESC LIMIT {length}",
+        (username,),
+    )
+    rows = cursor.fetchall()
+    cursor.close()
+    return rows
+
+
 def getTime(add):
     now = datetime.now()
     return now + timedelta(days=add)
@@ -663,6 +680,31 @@ def change_password():
             return jsonify(False)
     else:
         return jsonify(False)
+
+
+@app.route("/manage", methods=["GET"])
+def manageRouteFunc():
+    logindb = get_login()
+    cursorlogin = logindb.cursor()
+    verified = True
+    if fl.current_user.is_authenticated:
+        username = fl.current_user.id
+        result = cursorlogin.execute(
+            "SELECT verified FROM users WHERE username=?", (username,)
+        ).fetchone()
+        if result:
+            verified = result[0]
+        else:
+            verified = True
+    else:
+        username = ""
+    return render_template(
+        "account/manage.jinja",
+        username=username,
+        cutText=cutText,
+        shorts=shorts(5),
+        status=verified,
+    )
 
 
 if __name__ == "__main__":

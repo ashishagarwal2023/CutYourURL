@@ -3,10 +3,14 @@
 		<style>
 			.top-banner {
 				margin-bottom: 30px;
+				padding: 2px;
 				backdrop-filter: blur(4px) saturate(177%);
 				background-color: rgba(255, 249, 249, 0.76);
 				box-shadow: 0 1px 4px #ccc;
 				overflow: hidden;
+				position: fixed;
+				width: 100%;
+				top: 0;
 				text-align: center;
 				z-index: 99;
 			}
@@ -21,19 +25,5 @@
 		<div class="top-banner alert alert-warning">
 			<a href="/account" class="alert-link">You are not currently verified. <span class="badge bg-primary">Verify now</span></a>
 		</div>
-		<script>
-			let banner = document.querySelector('div.top-banner');
-			let top_banner = banner.offsetTop;
-
-			function stickybanner() {
-				if (window.scrollY >= top_banner) {
-					banner.classList.add('sticky');
-				} else {
-					banner.classList.remove('sticky');
-				}
-			}
-
-			window.addEventListener('scroll', stickybanner);
-		</script>
 	{% endif %}
 {% endblock %}

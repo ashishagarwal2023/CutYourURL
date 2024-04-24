@@ -6,9 +6,10 @@
 				here</a></p>
 		{% else %}
 			<h2>Welcome, {{ username }}!</h2>
-			<p>Hello there, you are logged in as{{ username }}.</p>
-			<p><a class="btn btn-danger" href="/logout">Logout?</a>
-			<a href="/account" class="btn btn-primary">Account Settings</a></p>
+			<p>Hello there, you are logged in as {{ username }}.</p>
+			<p><a class="btn btn-danger" href="/logout">Logout?</a> &bull;
+				<a href="/account" class="btn btn-primary">Account Settings</a> &bull;
+				<a href="/manage" class="btn btn-primary">Manage your shorts</a></p>
 		{% endif %}
 	</section>
 {% endblock %}
