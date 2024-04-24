@@ -102,6 +102,13 @@ $ mv ./shorts.db ./cache/
 
 Make sure you have installed all dependencies too!
 
+## How to host on web/cannot host
+If you choose something like PythonAnywhere, first install all depends, then make cache db files, then:
+1. Add a credentials.json (the credentials must have your testing email as a testing user or available to your test account)
+2. Put the token.pickle file there: you cannot copy paste its binary, you can do all is: temporarily upload to a secure service, use curl to download and save it, then delete from online storage.
+
+I have also faced several issues during hosting but still made it work.
+
 ## ✍️ Authors <a name = "authors"></a>
 
 - [@ashishagarwal2023](https://github.com/ashishagarwal2023) - Idea & Initial work
